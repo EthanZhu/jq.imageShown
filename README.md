@@ -62,5 +62,6 @@ Future：
 	$('elem').imageShown('bulid',{'options'});
 	$('elem').imageShown('bulid','option','value');
 	
-When you do not use the option of data, you want write them into html, you can use 'build' command to generated data automatically
-I will give For more examples and more descriptions
+When you do not use the option of data, you want write them into html code, you can use 'build' command to generated data automatically.
+
+I will give  more examples and more descriptions
