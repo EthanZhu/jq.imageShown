@@ -241,7 +241,7 @@ $.extend(ImageShown.prototype, {
 					$i = $(['<li class="'+ c +'">Need image here.</li>'].join(""))
 				);
 				C ? $i.css({'z-index': t_- I, opacity: 0}):'';
-				if(!load) $(g_).error(function(){$i.html('<p class="'+$t._g(a,'_missing')+'">'+$t._g(a,'missing')+'</p>');});
+				if(!load) $(g_).load(function(){$i.attr('data-missing','false')}).error(function(){$i.attr('data-missing','true');$i.html('<p class="'+$t._g(a,'_missing')+'">'+$t._g(a,'missing')+'</p>');});
 				return $i;
 			},
 			GC = function(C, L, W){
@@ -682,8 +682,9 @@ $.extend(ImageShown.prototype, {
 		var _data = inst.data, _selected = inst.selected,_images = inst.images;
 		var returnCall = {
 			id: inst.id,
-			selected:inst.selected,
 			total:inst.total,
+			selected:inst.selected,
+			curMissing: inst.$currentli.attr('data-missing'),
 			curData: _data[_selected]? _data[_selected] : ''//image:_images[_selected]
 		}
 		inst.callDone = returnCall;
@@ -714,7 +715,6 @@ $.extend(ImageShown.prototype, {
 						curSrc===$t._blankImg ? $img[0].src=$img.attr('data-origital'):
 											(curSrc!=origital ? $img[0].src=origital:'');
 					}
-					
 				},
 				dataIndex = inst.selected,
 				//var $li;
@@ -769,8 +769,10 @@ $.extend(ImageShown.prototype, {
 				}
 				if($currentImg[0]){
 					$currentImg.load(function(){
+						$(this).closest('li').attr('data-missing','false')
 						loadFunc();
 					}).error(function(){
+						$(this).closest('li').attr('data-missing','true')
 						inst.$currentli.html('<p class="'+$t._g(inst,'_missing')+'">'+$t._g(inst,'missing')+'</p>')
 						loadFunc();
 					});
@@ -1128,9 +1130,36 @@ $.extend(ImageShown.prototype, {
 		var id = elem[0].id.replace(/([^A-Za-z0-9_-])/g, '\\\\$1'); // escape jQuery meta chars
 		return {id: id, 
 			$elem: elem,
-			$nav: '', $btnPrev: '',	$btnNext: '',	$scroll: '', $navList: '', $itemList: '',	$player: '', hoverPause:false,preLoad:true,
-			selected:0,_selected:0,timeOutID:null,$currentli:null,clickSelected:0, $tipsBg: '', $tipsInfo: '', $deepNav: '', completeImg:[],
-			scrollOver: null, data:null, images:[], total:0,btnClick:true,callDone:null,played:null,$tipsType:null,firstPlay:null,$playType:'',build:false
+			$nav: '', 
+			$btnPrev: '',	
+			$btnNext: '',	
+			$scroll: '', 
+			$navList: '', 
+			$itemList: '',	
+			$player: '', 
+			hoverPause:false,
+			preLoad:true,
+			selected:0,
+			_selected:0,
+			timeOutID:null,
+			$currentli:null,
+			clickSelected:0, 
+			$tipsBg: '', 
+			$tipsInfo: '', 
+			$deepNav: '', 
+			completeImg:[],
+			scrollOver: null, 
+			data:null, 
+			images:[], 
+			total:0,
+			btnClick:true,
+			callDone:null,
+			played:null,
+			$tipsType:null,
+			firstPlay:null,
+			$playType:'',
+			build:false
+//			curMissing:false
 		};
 	},
 
