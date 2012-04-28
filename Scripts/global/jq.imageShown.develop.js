@@ -126,7 +126,7 @@ $.extend(ImageShown.prototype, {
 	},
 	
 	_updateImageShown: function(inst){
-		console.log('_updateImageShown');
+		//console.log('_updateImageShown');
 		var $t = this;
 		inst.firstPlay = false;
 		if($t._g(inst,'player')){
@@ -1191,7 +1191,7 @@ $.extend(ImageShown.prototype, {
 		}
 		if (inst) {
 			extendRemove(inst.settings, settings);
-			console.log(inst.build);
+			//console.log(inst.build);
 			//if(!inst.build) this._updateImageShown(inst)
 			inst.build? inst.build = false:	this._updateImageShown(inst);
 			//this._updateImageShown(inst)
