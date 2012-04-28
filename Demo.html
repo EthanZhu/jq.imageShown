@@ -8,47 +8,50 @@
 	</head>
 	<body>
 		<div class="demo clearfix">
-			<div id="products" class="images-shown nums fl" style="display:none">
+			<div id="products" class="images-shown nums fl">
 				<ul>
 					<li class="img-thumb-item">
-						<p class="this-content"><a href="http://www.gomesoft.com" target="_blank"><img src="http://news.newone.com.cn/public/images/img/spic01111.jpg" alt="" /></a></p>
-<!-- 						<p class="global-link">http://www.google.com</p> -->
+						<p class="this-content"><a href="http://www.gomesoft.com" target="_blank"><img src="http://news.newone.com.cn/public/images/img/spic01.jpg" alt="" /></a></p>
+						<p class="global-link">http://www.google.com</p>
 					</li>
-					<li class="img-thumb-item"><a href="http://www.gomesoft.com"><img src="http://news.newone.com.cn/public/images/img/spic02.jpg" /></a></li>
-					<li class="img-thumb-item"><a href="http://www.gomesoft.com"><img src="http://news.newone.com.cn/public/images/img/spic03.jpg" /></a></li>
-					<li class="img-thumb-item"><a href="http://www.gomesoft.com"><img src="http://news.newone.com.cn/public/images/img/spic04.jpg" /></a></li>
+					<li class="img-thumb-item">
+						<p class="this-content"><a href="http://www.gomesoft.com" target="_blank"><img src="http://news.newone.com.cn/public/images/img/spic02.jpg" alt="" /></a></p>
+						<p class="global-link">http://www.google.com</p>
+					</li>
+					<li class="img-thumb-item">
+						<p class="this-content"><a href="http://www.gomesoft.com" target="_blank"><img src="http://news.newone.com.cn/public/images/img/spic03.jpg" alt="" /></a></p>
+						<p class="global-link">http://www.google.com</p>
+					</li>
+					<li class="img-thumb-item">
+						<p class="this-content"><a href="http://www.gomesoft.com" target="_blank"><img src="http://news.newone.com.cn/public/images/img/spic04.jpg" alt="" /></a></p>
+						<p class="global-link">http://www.google.com</p>
+					</li>
 				</ul>
 				<ul>
 					<li class="img-player-item">
 						<p class="this-content"><a href="http://www.google.com" target="_blank"><img src="http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-21/1300702369312-1212.jpg"></a></p>
-						<p class="global-link">http://www.google.com</p>
 						<label>
 							<h2>h2标题</h2>
 							<h3>h3标题</h3>
 							<p class="tip-message">内容介绍</p>
 							<p class="other-titles">
-								<span class="name">name1</span>
-								<a href="http://gomesoft.com">t1</a>
-								<a href="http://gomesoft.com">t2</a>
-								<a href="http://gomesoft.com">t3</a>
+								<span class="name">类型</span>
+								<a href="http://www.google.com">生活剧</a>
+								<a href="http://google.com">爱情剧</a>
 							</p>
 							<p class="other-titles">
-								<span class="name">name2</span>
-								<a href="http://gomesoft.com">t1</a>
-								<a href="http://gomesoft.com">t2</a>
-								<a href="http://gomesoft.com">t3</a>
+								<span class="name">导演</span>
+								<a href="http://google.com">朱宜栋</a>
 							</p>
 							<p class="other-titles">
-								<span class="name">name3</span>
-								<a href="http://gomesoft.com">t1</a>
-								<a href="http://gomesoft.com">t2</a>
-								<a href="http://gomesoft.com">t3</a>
+								<span class="name">主演</span>
+								<a href="http://google.com">朱宜栋</a>
+								<a href="http://google.com">Ethan</a>
+								<a href="http://google.com">Sharon</a>
 							</p>
 							<p class="play-type">comic</p>
 							<p class="tip-btns">
-								<a href="http://gomesoft.com"></a>
-								<a href="http://gomesoft.com">zy</a>
-								<a href="http://gomesoft.com">movie</a>
+								<a class="zy" href="http://gomesoft.com">Cheap Video Converter</a>
 							</p>
 						</label>
 					</li>
@@ -56,8 +59,8 @@
 			</div>
 			<div id="lvyou" class="images-shown nums fl"></div>
 		</div>
-
- 		<div class="demo">
+<div id="build-data"></div>
+<!--  		<div class="demo">
 			<div id="qiyi" class="images-shown"></div>
 		</div>
 		<div class="demo">
@@ -74,18 +77,18 @@
 		</div>
 		<div class="demo">
 			<div id="left" class="images-shown"></div>
-		</div>
+		</div> -->
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script>
     if(!window.jQuery)
     document.write('<script type="text/javascript" src="Scripts/libs/jquery/1.4.2/jquery.min.js"><'+'/script>');
 </script>
 <script type="text/javascript" src="Scripts/global/jq.imageShown.develop.js"></script>
-<!-- <script type="text/javascript" src="Scripts/global-min/jq.imageShown.build.js"></script> -->
+<script type="text/javascript" src="Scripts/global/jq.imageShown.build.js"></script>
 <script>
 $(function(){
 $('.images-shown').imageShown();
-// $('#products').imageShown('build');
+$('#products').imageShown('build','tipsBtn',true);
 $('#lvyou').imageShown('option',{
 	'navNum':8,
 	'navSpace':25,
@@ -100,7 +103,7 @@ $('#lvyou').imageShown('option',{
 {
 	'b':'Content/images/MG_1221.jpg',
 	'l':'http://www.gomesoft.com',
-	'm':'厦门鼓浪屿风景之一。'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'Content/images/IMG_1218909.jpg',
@@ -151,43 +154,43 @@ $('#left').imageShown('option',{
 	'b':'http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-21/1300702369312.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic01.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'私人业务'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'http://news.newone.com.cn/public/images/img/lpic02.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic02.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'机构业务'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-22/1300778851281.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic03.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'理财业务'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'http://news.newone.com.cn/public/images/img/lpic04.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic04.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'国际业务'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'http://news.newone.com.cn/public/cms/public/upload/ad/2012-03-28/1332917208343.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic01.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'投资教育'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'http://news.newone.com.cn/public/cms/public/upload/ad/2012-04-19/1334827908953.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic03.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'基金'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 },
 {
 	'b':'http://news.newone.com.cn/public/cms/public/upload/ad/2012-01-18/1326870513500.jpg',
 	's':'http://news.newone.com.cn/public/images/img/spic04.jpg',
 	'l':'http://www.gomesoft.com',
-	't':'招聘'
+	't':'Cheap Video Converter, DVD Burner software provider.'
 }
 ]
 });
@@ -267,19 +270,19 @@ $('#qiyi1').imageShown('option',{
 	'target':'_self',
 'data':[
 {
-	'b':{'p':'Content/images/qiyi/bd4816dfbaea4139b7ba66d07df3de8f.jpg','t':'_blank','l':'http://www.gomesoft.com'},
+	'b':{'p':'Content/images/qiyi/bd4816dfbaea4139b7ba66d07df3de8f.jpg','t':'_blank'},
 	's':{'p':'Content/images/qiyi/6ec7f6d68fbf4e2eb4662ca00df0a2f5.jpg','w':'161','h':'50'},
 	'l':'http://yule.iqiyi.com/2bjiff.html?area=focus&c=main&rank=1',
 	't':'第二届北京国际电影节开幕 群星璀璨光影流金'
 },
 {
-	'b':{'p':'Content/images/qiyi/7070e6656bb2427283bd15b20983a36c.jpg','t':'_blank','l':'http://www.gomesoft.com'},
+	'b':{'p':'Content/images/qiyi/7070e6656bb2427283bd15b20983a36c.jpg','t':'_blank'},
 	's':{'p':'Content/images/qiyi/529e0cdad66648dd8e9a300ffaafb4e2.jpg','w':'80','h':'50'},
 	'l':'http://yule.iqiyi.com/celebrity.html?area=focus&c=main&rank=2',
 	't':'头号人物：罗志祥与Angelababy甜蜜合体'
 },
 {
-	'b':{'p':'Content/images/qiyi/c251ef108833496b9f440789522ad011.jpg','t':'_blank','l':'http://www.gomesoft.com'},
+	'b':{'p':'Content/images/qiyi/c251ef108833496b9f440789522ad011.jpg','t':'_blank'},
 	's':{'p':'Content/images/qiyi/94ebd4e9201842e09905a93c933d7074.jpg','w':'80','h':'50'},
 	'l':'http://www.iqiyi.com/dianying/20120423/a96c1e0d48430ac8.html?area=focus&c=main&rank=3',
 	't':'《love》舒淇、赵薇、阮经天、赵又廷情爱纠葛'
