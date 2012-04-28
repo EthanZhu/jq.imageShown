@@ -15,6 +15,7 @@
 .fl{float: left}
 .ml20{margin-left:20px;}
 .demo {background:#242424; margin:10px 10px; padding:10px 10px; display:block;}
+.img-load-missing{color:#fff; font-size:14px;padding:30px;}
 .images-shown{position:relative; overflow:hidden; z-index: 1; display:block;}
 .images-shown img{ border:none; display:block;}
 .img-thumbnail{position:absolute;display: block; z-index: 2}

@@ -7,7 +7,7 @@
  * @link            http://www.gomesoft.com
  * @docs            http://www.gomesoft.com/plugins/ethan/imageshown
  * @version         Version 1.0
- * @email						pig.whose@gmail.com; 12377166@qq.com
+ * @email			pig.whose@gmail.com; 12377166@qq.com
  * 
  *
  ******************************************/
@@ -43,7 +43,8 @@ function ImageShown(){
 		_otitle:'img-tips-ot',
 		_tbtn:'img-tips-btn',
 		_ptype:'img-player-type',
-		_addtional:'img-thumb-addtional'
+		_addtional:'img-thumb-addtional',
+		_missing: 'img-load-missing'
 	};
 	this._defaults = {
 		id:	null,
@@ -78,13 +79,14 @@ function ImageShown(){
 		listPlace:null,
 		tipsBtn:false, 
 		loadClass: 'img-player-loading',
-		pContent:'image'
+		pContent:'image',
+		missing:'内容加载错误'
 	};
 	
 	$.extend(this._defaults, this.classes['']);
 }
 $.extend(ImageShown.prototype, {
-	markerClassName: 'hasImageShown',
+	marker: 'hasImageShown',
 	log: function () {
 		if (this.debug)
 			console.log.apply('', arguments);
@@ -116,81 +118,44 @@ $.extend(ImageShown.prototype, {
 		var inst = this._newInst($(elem));
 		inst.settings = $.extend({}, settings || {}, inlineSettings || {});
 		
-		if ($elem.hasClass(this.markerClassName)) return;
-		$elem.addClass(this.markerClassName);
+		if ($elem.hasClass(this.marker)) return;
+		$elem.addClass(this.marker);
 		$.data(elem, PROP_NAME, inst);
 		this._updateImageShown(inst);
 	
 	},
-	_buildImageShown: function(target, name, value){
-		var $t = this;
-		$t._optionImageShown(target, name, value, 'noUpdate');
-		var a = $t._getInst(target);
-		var $l = a.$elem.find('li.'+$t._g(a,'_item'));
-		var $P = a.$elem.find('li.'+$t._g(a,'_pitem'));
-		var n = $t._g(a,'tContent');
-		var p = $t._g(a,'pContent');
-		var player;
-		if($l[0]!='undefined'){
-			extendRemove(a.settings,{'preload':false});
-			typeof $P[0]=='undefined' ? extendRemove(a.settings,{'player':false}):'';
-			player = $t._g(a,'player');
-			var i, mainLength = $l.length, gLink, info, target, content, width, height;
-			var buildData = function(A,T){
-				var B,C,L='',E='',F='',G='',W='',H='';
-				if(T!='title'){
-					B = A.find('a:first'), C = A.find('img'),
-					typeof B[0]!='undefined' ? (L=B[0].href, G=B[0].target) :'';
-					T == 'content'? E = A.html():(typeof C[0]!='undefined'? (E = C[0].src,W = C[0].width ? C[0].width:'',H = C[0].height ? C[0].height:''):'') ;
-					if(G&&G!='') return '{"p":"'+E+'","l":"'+L+'","t":"'+G+'","w":"'+W+'","h":"'+H+'"}'
-					else  return '{"p":"'+E+'","l":"'+L+'","w":"'+W+'","h":"'+H+'"}'
-				}
-				else if(T=='title'){
-					B = A.find('a:first')
-				}
-				
-			}
-			var $thisNav,$thisPlay;
-			for (i=0;i<mainLength;i++){
-				$thisNav = $l.eq(i), $thisPlay
-				glink = $l.eq(i).find('p.this-link');
-				
-			}
-		}
-		a.data?	$t._updateImageShown(a):'';
-		//console.log(a);
-	},
+	
 	_updateImageShown: function(inst){
-		//console.log('_updateImageShown');
+		console.log('_updateImageShown');
 		var $t = this;
 		inst.firstPlay = false;
-		if(this._g(inst,'player')){
-			inst.$player = $('<div class="'+this._g(inst,'_player')+'" />');
-			if(this._g(inst,'preload')){
-				var _loading = this._g(inst,'loadClass');
+		if($t._g(inst,'player')){
+			inst.$player = $('<div class="'+$t._g(inst,'_player')+'" />');
+			if($t._g(inst,'preload')){
+				var _loading = $t._g(inst,'loadClass');
 				if(!inst.$player.hasClass(_loading)) inst.$player.addClass(_loading);
 			}
 			else if(inst.$player.hasClass(_loading)) inst.$player.removeClass(_loading);
-			$('<ul class="'+ this._g(inst,'_plist') +'" />').appendTo(inst.$player);
+			$('<ul class="'+ $t._g(inst,'_plist') +'" />').appendTo(inst.$player);
 		} 
 		else{
 			inst.$player = '';
 		}
 		//console.log(this._g(inst,'_thumbnail'));
-		inst.$nav = $('<div class="'+this._g(inst,'_thumb')+'" />');
-		inst.$btnPrev = $('<div class="'+this._g(inst,'_btn')+'"><span class="'+this._g(inst,'_btnPrev')+'" />');
-		inst.$btnNext = $('<div class="'+this._g(inst,'_btn')+' '+this._g(inst,'_aside')+'"><span class="'+this._g(inst,'_btnNext')+'" />');
-		inst.$navList = $('<div class="'+this._g(inst,'_tlist')+'" />');
-		inst.$itemList = $('<ul class="'+this._g(inst,'_items')+'" />');
+		inst.$nav = $('<div class="'+$t._g(inst,'_thumb')+'" />');
+		inst.$btnPrev = $('<div class="'+$t._g(inst,'_btn')+'"><span class="'+$t._g(inst,'_btnPrev')+'" />');
+		inst.$btnNext = $('<div class="'+$t._g(inst,'_btn')+' '+$t._g(inst,'_aside')+'"><span class="'+$t._g(inst,'_btnNext')+'" />');
+		inst.$navList = $('<div class="'+$t._g(inst,'_tlist')+'" />');
+		inst.$itemList = $('<ul class="'+$t._g(inst,'_items')+'" />');
 		
-		if(this._g(inst,'showTips')){
-			inst.$tipsBg = $('<div class="'+this._g(inst,'_tbackground')+'" />');
-			inst.$tipsInfo = $('<div class="'+this._g(inst,'_tinfo')+'">');
+		if($t._g(inst,'showTips')){
+			inst.$tipsBg = $('<div class="'+$t._g(inst,'_tbackground')+'" />');
+			inst.$tipsInfo = $('<div class="'+$t._g(inst,'_tinfo')+'">');
 		}
 		else{
 			inst.$tipsBg = '';inst.$tipsInfo = '';
 		}
-		var thisData = this._g(inst,'data');
+		var thisData = $t._g(inst,'data');
 		var instData = inst.data;
 		if(thisData&&!instData){
 			inst.data = [];
@@ -215,32 +180,11 @@ $.extend(ImageShown.prototype, {
 		var data = inst.data;
 		if(data&&isArray(data)){//data is not null and data is an array
 			inst.total = data.length;
-			this._updeteOptions(inst);
-			this._instHtml(inst);
-			this._initEvents(inst);
+			$t._updeteOptions(inst);
+			$t._instHtml(inst);
+			$t._initEvents(inst);
 		}
 
-	},
-	
-	_getProperty: function(A,B,C,W,H){
-		var a, b, c, d, w_, h_, f;
-		w_ = W||'', h_=H||'';
-		if(typeof A=='string'){
-			b=A, a=B, c=C, d='';
-		}
-		else{
-			f= isArray(A)? A[0]: A;
-			!$.isEmptyObject(f)? (
-				a = f.l ? f.l : B,
-				b = f.p ? f.p : '',
-				c = f.t ? f.t : C,
-				d = f.a ? f.a : '',
-				w_ = f.w ? f.w : w_,
-				h_ = f.h ? f.h : h_
-			):'';
-		}
-		if(b) return {l:a, p: b, t: c, a: d, h:h_, w:w_};
-		else return 'nothing';
 	},
 	_instHtml:function(a){
 		var $t=this, 
@@ -265,56 +209,76 @@ $.extend(ImageShown.prototype, {
 			load = $t._g(a,'preload'), 
 			p_ = $t._g(a,'player');
 		a.images=[];
-		var GI = function(A,L,W,C,I){
-			var i_, g_, $i, c;
-			W=='play'? (i_=$t._getProperty(A.b,L,t,w,h) , c=p)
-						: (i_=$t._getProperty(A.s,L,t), c=m);
-			i_!='nothing'?(
-				i_.w&&i_.h&&i_.w!=''&&i_.h!='' ? (g_ = load ? ('data-origital="'+i_.p+'" width="'+i_.w+'" height="'+i_.h+'" src="'+$t._blankImg+'"') : ('width="'+i_.w+'" height="'+i_.h+'" src="'+i_.p+'"'))
-											   : (g_ = load ? ('data-origital="'+i_.p+'" src="'+$t._blankImg+'"') :('src="'+i_.p+'"'))
-				,
-				$i = $(['<li class="'+ c +'"><a href="'+ i_.l +'" target="'+ i_.t +'"><img '+ g_ +' alt="'+ i_.a +'" /></a></li>'].join(""))
-			):(
-				$i = $(['<li class="'+ c +'">Need image here.</li>'].join(""))
-			);
-			C ? $i.css({'z-index': t_- I, opacity: 0}):'';
-			return $i;
-		},
-		GC = function(C, L, W){
-			var $C, $H, c =	W =='nav'? m : p;
-			if (typeof C=='string'){
-				$C = $('<div>'+C+'</div>');
-				$H = $C.find('a');
-				$C = $H.size()>0? ($H.attr('target',t),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
-								: $(['<li class="'+ c +'"><a href="'+L+'" target="'+t+'">'+C+'</a></li>'].join(""));
-			} 
-			else if(typeof C=='object'){
-				if(!isEmptyObject(C)){
-					var l_= C.l? C.l:l, g_= C.t? C.t:t, c_= C.p;
-					$C = $('<div>'+c_+'</div>');
+		var GP = function(A,B,C,W,H){
+				var a, b, c, d, w_, h_, f;
+				w_ = W||'', h_=H||'';
+				if(typeof A=='string'){
+					b=A, a=B, c=C, d='';
+				}
+				else{
+					f= isArray(A)? A[0]: A;
+					!$.isEmptyObject(f)? (
+						a = f.l ? f.l : B,
+						b = f.p ? f.p : '',
+						c = f.t ? f.t : C,
+						d = f.a ? f.a : '',
+						w_ = f.w ? f.w : w_,
+						h_ = f.h ? f.h : h_
+					):'';
+				}
+				if(b) return {l:a, p: b, t: c, a: d, h:h_, w:w_};
+				else return 'nothing';
+			},
+			GI = function(A,L,W,C,I){
+				var i_, g_, $i, c;
+				W=='play'? (i_=GP(A.b,L,t,w,h) , c=p)
+							: (i_=GP(A.s,L,t), c=m);
+				i_!='nothing'?(
+					i_.w&&i_.h&&i_.w!=''&&i_.h!='' ? (g_ = load ? ('<img data-origital="'+i_.p+'" width="'+i_.w+'" height="'+i_.h+'" src="'+$t._blankImg+'" alt="'+ i_.a +'" />') : ('<img width="'+i_.w+'" height="'+i_.h+'" src="'+i_.p+'" alt="'+ i_.a +'" />') )
+												   : (g_ = load ? ('<img data-origital="'+i_.p+'" src="'+$t._blankImg+'" alt="'+ i_.a +'" />') : ('<img src="'+i_.p+'" alt="'+ i_.a +'" />')),
+					$i = $(['<li class="'+ c +'"><a href="'+ i_.l +'" target="'+ i_.t +'">'+g_+'</a></li>'].join(""))
+				):(
+					$i = $(['<li class="'+ c +'">Need image here.</li>'].join(""))
+				);
+				C ? $i.css({'z-index': t_- I, opacity: 0}):'';
+				if(!load) $(g_).error(function(){$i.html('<p class="'+$t._g(a,'_missing')+'">'+$t._g(a,'missing')+'</p>');});
+				return $i;
+			},
+			GC = function(C, L, W){
+				var $C, $H, c =	W =='nav'? m : p;
+				if (typeof C=='string'){
+					$C = $('<div>'+C+'</div>');
 					$H = $C.find('a');
-					$C = $H.size()>0? ($H.attr('target',g_),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
-									: $(['<li class="'+ c +'"><a href="'+ l_ +'" target="'+ g_ +'">'+ c_ +'</a></li>'].join(""));
-				}
-			}
-			return $C;
-			$C = $H = null;
-		},
-		ST = function(D,T){
-			for(i=0; i<t_; i++){
-				f = D[i], l = f.l;//global link
-				if(!isEmptyObject(f)){
-					switch (T){
-						case 'image':n = GI(f,l);break;
-						case 'num':n = $(['<li class="'+m+'"><span>'+(i+1)+'</span></li>'].join(""));break;
-						case 'content':n = GC(f.s,l,'nav');break;
-						default : n = $(['<li class="'+ m +'"><span>&nbsp;</span></li>'].join(""));
+					$C = $H.size()>0? ($H.attr('target',t),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
+									: $(['<li class="'+ c +'"><a href="'+L+'" target="'+t+'">'+C+'</a></li>'].join(""));
+				} 
+				else if(typeof C=='object'){
+					if(!isEmptyObject(C)){
+						var l_= C.l? C.l:l, g_= C.t? C.t:t, c_= C.p;
+						$C = $('<div>'+c_+'</div>');
+						$H = $C.find('a');
+						$C = $H.size()>0? ($H.attr('target',g_),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
+										: $(['<li class="'+ c +'"><a href="'+ l_ +'" target="'+ g_ +'">'+ c_ +'</a></li>'].join(""));
 					}
-					n.attr('data-index', i);
-					n.appendTo(a.$itemList)
 				}
-			}
-		};
+				return $C;
+				$C = $H = null;
+			},
+			ST = function(D,T){
+				for(i=0; i<t_; i++){
+					f = D[i], l = f.l;//global link
+					if(!isEmptyObject(f)){
+						switch (T){
+							case 'image':n = GI(f,l);break;
+							case 'num':n = $(['<li class="'+m+'"><span>'+(i+1)+'</span></li>'].join(""));break;
+							case 'content':n = GC(f.s,l,'nav');break;
+							default : n = $(['<li class="'+ m +'"><span>&nbsp;</span></li>'].join(""));
+						}
+						n.attr('data-index', i);
+						n.appendTo(a.$itemList)
+					}
+				}
+			};
 		if(p_){
 			var c = $t._g(a,'pContent');
 			for(i=0; i<t_; i++){
@@ -425,36 +389,41 @@ $.extend(ImageShown.prototype, {
 			inst.selected = 0;
 		}
 	},
-	_btnsHover: function(inst){
-		var $t=this,$arrows;
-		$arrows = inst.$nav.find('.'+$t._g(inst,'_btn'));
-		inst.$nav = null;
-		var _active = $t._g(inst,'_active');
-		var _hover = $t._g(inst,'_hover');
-		var _aside = $t._g(inst,'_aside');
-		if($arrows) $arrows.addClass(_active);
-		if(!$t._g(inst,'loop')){
-			if((inst.selected+1) <= $t._g(inst,'navNum')) {
-				 $arrows.each(function(){
-					 var $ts = $(this);
-					 $ts.hasClass(_aside)? $ts.addClass(_active): $ts.removeClass(_active);
-				})
-			}
-		}
-		$arrows.hover(function(){
-				var $ts = $(this);
-				if($ts.hasClass(_active)) $ts.addClass(_hover);
-			},function(){
-				var $ts = $(this);
-				if($ts.hasClass(_active)&&$ts.hasClass(_hover)) $ts.removeClass(_hover);
-		});
-	},
+	
 	_initEvents: function(inst){
 		var $t = this;
-		$t._btnsHover(inst);
+		var bindItemEvent = function(){
+			var tag = $t._g(inst,'navNum'), addtional =$t._g(inst,'addtional'), $list= inst.$itemList, $items = $list.find('li'), ev = $t._g(inst,'events');
+			if(tag=='css' && addtional) $list = inst.$addtional.find('ul');
+			$list.delegate('li.',ev,function(e){
+				var $this = $(this), index = $this.attr('data-index');
+	            if (ev=='click') e.preventDefault();
+	            if(index!=inst.selected){
+	            	!addtional?$t._thumbSelected($this,inst):$t._thumbSelected($items.eq(index),inst)
+	            }
+			});
+		},
+		btnsHover= function(){
+			var $arrows = inst.$nav.find('.'+$t._g(inst,'_btn'));
+			inst.$nav = null;
+			var _active = $t._g(inst,'_active');
+			var _hover = $t._g(inst,'_hover');
+			var _aside = $t._g(inst,'_aside');
+			if($arrows) $arrows.addClass(_active);
+			if(!$t._g(inst,'loop')){
+				if((inst.selected+1) <= $t._g(inst,'navNum'))
+					$arrows.each(function(){ var $ts = $(this); $ts.hasClass(_aside)? $ts.addClass(_active): $ts.removeClass(_active);});
+			}
+			$arrows.hover(function(){
+					var $ts = $(this); if($ts.hasClass(_active)) $ts.addClass(_hover);
+				},function(){
+					var $ts = $(this); if($ts.hasClass(_active)&&$ts.hasClass(_hover)) $ts.removeClass(_hover);
+			});
+		};
+		btnsHover();
 		$t._btnsNextClick(inst);
 		$t._btnsPrevClick(inst);
-		$t._bindItemEvent(inst);
+		bindItemEvent();
         var auto = $t._g(inst,'autoPlay'),loop = $t._g(inst,'loop');
         inst.$elem.hover(function() {
         	inst.hoverPause = true;
@@ -534,26 +503,7 @@ $.extend(ImageShown.prototype, {
 		
 		this._startAuto(inst);
 	},
-	_bindItemEvent: function(inst){
-		var $t = this, _css = $t._g(inst,'navNum'), _addtional=$t._g(inst,'addtional'), $list= inst.$itemList,ev = $t._g(inst,'events')
-		$list.delegate('li.',ev,function(e){
-			var $this = $(this),
-            	index = $this.attr('data-index');
-            if (ev=='click') e.preventDefault();
-            if(index!=inst.selected){
-            	$t._thumbSelected($this,inst);
-            }
-		});
-		if(_css=='css' && _addtional){
-			inst.$addtional.delegate('li',ev,function(e){
-				var $this = $(this), index = $this.attr('data-index');
-				if (ev=='click') e.preventDefault();
-				if(index!=inst.selected){
-					$t._thumbSelected($list.find('li').eq(index),inst);
-				}
-			})
-		}
-	},
+
 	_thumbSelected: function(obj,inst){
 		var $t = this, 
 			speed = $t._g(inst,'tbgSpeed'),
@@ -610,16 +560,7 @@ $.extend(ImageShown.prototype, {
 						: $scroll.animate({left:0},bgSpeed)
 				   ): '';
 	},
-	_getTitle: function(title,link,target){
-		var _title;
-		if (typeof title=='string') return _title = link=='none'? title:('<a href="'+link+'" target="'+target+'">'+title+'<\/a>');
-		else if(typeof title=='object'){
-			var _link = title.l? title.l:link,
-				_target=title.g? title.g:target;
-			return _title = _link=='none'? title.t:('<a href="'+_link+'" target="'+_target+'">'+title.t+'<\/a>');
-		}
-		else return '';
-	},
+	
 	_setInfo: function(inst){
 		var $t = this;
 		var tips = $t._g(inst,'showTips');
@@ -638,46 +579,76 @@ $.extend(ImageShown.prototype, {
 				_class = (_type ? (_ptype+' '+_ptype+'-'+_type) : _ptype) ;
 				inst.$playType[0].className = _class;
 			}
-			
+			var GT= function(T,L,G){
+					var T_;
+					if (typeof T=='string') return T_ = L=='none'? T:('<a href="'+L+'" target="'+G+'">'+T+'<\/a>');
+					else if(typeof T=='object'){
+						var L_ = T.l? T.l:L, G_=T.g? T.g:G;
+						return T_ = L_=='none'? T.t:('<a href="'+L_+'" target="'+G_+'">'+T.t+'<\/a>');
+					}
+					else return '';
+				},
+				GL = function(E,L,T){
+					if(E&& !isArray(E)) return GT(E,L,T);
+						var l_ = E.length, e_='';
+						for(var i=0; i<l_; i++){e_ +=GT(E[i],L,T);}
+						return e_;				
+				};
+				GOT= function(I,L,T){
+					var c_ = $t._g(inst,'_otitle');
+					if (typeof I=='string') return '<p class="'+c_+'">'+I+'<\/p>';
+					if (typeof I=='object'){
+						if(I&&!isArray(I)) 
+							return '<p class="'+c_+'"><label class="name">'+GT(I.n,'none')+': <\/label>'+GL(I.list,L,T)+'<\/p>';
+						var L_ = I.length,O=[],I_;
+						for(var i=0; i<L_; i++){
+							I_ = I[i];
+							O.push('<p class="'+c_+'">');
+							O.push('<label class="name">'+GT(I_.n,'none')+': <\/label>');
+							O.push(GL(I_.list, L, T))
+							O.push('<\/p>');
+						}
+						return O.join("");
+					}
+				};
+			var GTB = function(B,L,G,C){
+				if (typeof B=='string') return '<a class="'+C+' '+C+'-'+B+'" href="'+L+'" target="'+G+'"></a>';
+				else if (typeof B=='object'){
+					var L_,G_,C_,T_;
+					if(!isEmptyObject(B)){
+						L_ = B.l? B.l:L,
+						G_= B.t? B.t:G,
+						C_= B.c? C+'-'+B.c:C,
+						T_ = B.t_? B.t_:'';
+						return '<a class="'+C+' '+C_+'" href="'+L_+'" target="'+G_+'">'+T_+'</a>';
+					}
+				}
+				else return '<a class="'+C+'" href="'+L+'" target="'+G+'"></a>';
+			};
 			var info = '',
-				_h2 = $t._getTitle(thisInfo.t,_link,target),
-				_h3 = $t._getTitle(thisInfo.t1,_link,target),
-				_hr='';
-			_h2= _h2!='' ? '<h2>'+_h2+'<\/h2>':'' ;
-			_h3= _h3!='' ? '<h3>'+_h3+'<\/h3>':'' ;
-			if(_h2!='' || _h3!='') _hr='<hr class="separator" />';
-			info += _h2+_h3+_hr;
+				h2_ = GT(thisInfo.t,_link,target),
+				h3_ = GT(thisInfo.t1,_link,target),
+				hr_='';
+			h2_= h2_!='' ? '<h2>'+h2_+'<\/h2>':'' ;
+			h3_= h3_!='' ? '<h3>'+h3_+'<\/h3>':'' ;
+			if(h2_!='' || h3_!='') hr_='<hr class="separator" />';
+			info += h2_+h3_+hr_;
 			var ot = thisInfo.ot;
-			ot= $t._getOtherTitle(ot,_link,target,inst);
+			ot= GOT(ot,_link,target,inst);
 			ot= typeof ot !='undefined'? ot:'';
 			var msg = thisInfo.m? '<p class="info">'+thisInfo.m+'<\/p>':'';
 			info += ot+msg;
 			if ($t._g(inst,'tipsBtn')){
 				var _btn = $t._g(inst,'_tbtn');
-				var _tbtn = $t._getTipsBtn(thisInfo.b_, _link,target, _btn);
+				var _tbtn = GTB(thisInfo.b_, _link,target, _btn);
 				info +=_tbtn;
 			}
 			$t._tipsAnimate(inst,info);
 		}
 	},
-	_getTipsBtn: function(btn,link,target,cls){
-		if (typeof btn=='string') return '<a class="'+cls+' '+cls+'-'+btn+'" href="'+link+'" target="'+target+'"></a>';
-		else if (typeof btn=='object'){
-			var _link,_target,_class,_txt;
-			if(!isEmptyObject(btn)){
-				_link = btn.l? btn.l:link,
-				_target= btn.t? btn.t:target,
-				_class= btn.c? cls+'-'+btn.c:cls,
-				_txt = btn.t_? btn.t_:'';
-				return '<a class="'+cls+' '+_class+'" href="'+_link+'" target="'+_target+'">'+txt+'</a>';
-			}
-		}
-		else return '<a class="'+cls+'" href="'+link+'" target="'+target+'"></a>';;
-		
-	},
+	
 	_tipsAnimate: function(inst,info){
 		var $tipsInfo = inst.$tipsInfo,$tipsBg = inst.$tipsBg, tipsAnimate =this._g(inst,'tipsAnimate');
-		
 		var _$info = $tipsInfo.find('div').not('.tips-corner');
 		switch (tipsAnimate){
 			case 'slide':{
@@ -706,33 +677,6 @@ $.extend(ImageShown.prototype, {
 			}
 		}
 		
-	},
-	_getOtherTitle: function(info,link,target,inst){
-		var $t = this, _class = $t._g(inst,'_otitle');
-		if (typeof info=='string') return '<p class="'+_class+'">'+info+'<\/p>';
-		if (typeof info=='object'){
-			var getlist = function(list){
-				if(list&& !isArray(list)) return $t._getTitle(list,link,target);
-				var _Length = list.length, _list='';
-				for(var i=0; i<_Length; i++){
-					_list +=$t._getTitle(list[i],link,target);
-				}
-				return _list;				
-			};
-			
-			if(info&&!isArray(info)) 
-				return '<p class="'+_class+'"><label class="name">'+$t._getTitle(info.n,'none')+': <\/label>'+getlist(info.list)+'<\/p>';
-			var length = info.length,ot=[],_info;
-			for(var i=0;i<length;i++){
-				_info = info[i];
-				ot.push('<p class="'+_class+'">');
-				ot.push('<label class="name">'+$t._getTitle(_info.n,'none')+': <\/label>');
-				ot.push(getlist(_info.list))
-				ot.push('<\/p>');
-			}
-			return ot.join("");
-		}
-
 	},
 	_setCallback: function(inst){
 		var _data = inst.data, _selected = inst.selected,_images = inst.images;
@@ -818,11 +762,22 @@ $.extend(ImageShown.prototype, {
 			else{
 				var _$played = inst.played;
 				if(_$played) _$played.css('opacity','0.3');
-				$currentImg.load(function(){
+				var loadFunc = function(){
 					inst.preLoad = false;
 					doPlayerAnimate();
 					callback? callback(inst.callDone):'';
-				});
+				}
+				if($currentImg[0]){
+					$currentImg.load(function(){
+						loadFunc();
+					}).error(function(){
+						inst.$currentli.html('<p class="'+$t._g(inst,'_missing')+'">'+$t._g(inst,'missing')+'</p>')
+						loadFunc();
+					});
+				}
+				else{
+					loadFunc();
+				}
 				inst.completeImg.push($(this));
 			}
 
@@ -1175,7 +1130,7 @@ $.extend(ImageShown.prototype, {
 			$elem: elem,
 			$nav: '', $btnPrev: '',	$btnNext: '',	$scroll: '', $navList: '', $itemList: '',	$player: '', hoverPause:false,preLoad:true,
 			selected:0,_selected:0,timeOutID:null,$currentli:null,clickSelected:0, $tipsBg: '', $tipsInfo: '', $deepNav: '', completeImg:[],
-			scrollOver: null, data:null, images:[], total:0,btnClick:true,callDone:null,played:null,$tipsType:null,firstPlay:null,$playType:''
+			scrollOver: null, data:null, images:[], total:0,btnClick:true,callDone:null,played:null,$tipsType:null,firstPlay:null,$playType:'',build:false
 		};
 	},
 
@@ -1206,9 +1161,15 @@ $.extend(ImageShown.prototype, {
 		}
 		if (inst) {
 			extendRemove(inst.settings, settings);
-			this._updateImageShown(inst);
+			console.log(inst.build);
+			//if(!inst.build) this._updateImageShown(inst)
+			inst.build? inst.build = false:	this._updateImageShown(inst);
+			//this._updateImageShown(inst)
 		}
 		inst = null;
+	},
+	_extendRemove:function(target, props) {
+		extendRemove(target, props);
 	}
 });
 

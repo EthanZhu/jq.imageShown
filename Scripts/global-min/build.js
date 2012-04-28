@@ -1,0 +1,1 @@
+({appDir:".",dir:"../global-min"})

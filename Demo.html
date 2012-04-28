@@ -8,11 +8,11 @@
 	</head>
 	<body>
 		<div class="demo clearfix">
-			<div id="products" class="images-shown nums fl" style="display:none">
+			<div id="products" class="images-shown nums fl">
 				<ul>
 					<li class="img-thumb-item">
-						<a href="http://www.gomesoft.com"><img src="http://news.newone.com.cn/public/images/img/spic01.jpg" alt="" /></a>
-						<p class="global-link">http://www.gomesoft.com</p>
+						<p class="this-content"><a href="http://www.gomesoft.com" target="_blank"><img src="http://news.newone.com.cn/public/images/img/spic01111.jpg" alt="" /></a></p>
+<!-- 						<p class="global-link">http://www.google.com</p> -->
 					</li>
 					<li class="img-thumb-item"><a href="http://www.gomesoft.com"><img src="http://news.newone.com.cn/public/images/img/spic02.jpg" /></a></li>
 					<li class="img-thumb-item"><a href="http://www.gomesoft.com"><img src="http://news.newone.com.cn/public/images/img/spic03.jpg" /></a></li>
@@ -20,7 +20,8 @@
 				</ul>
 				<ul>
 					<li class="img-player-item">
-						<p class="play-content"><a href="http://www.google.com" target="_blank"><img src="http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-21/1300702369312.jpg"></a></p>
+						<p class="this-content"><a href="http://www.google.com" target="_blank"><img src="http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-21/1300702369312-1212.jpg"></a></p>
+						<p class="global-link">http://www.google.com</p>
 						<label>
 							<h2>h2标题</h2>
 							<h3>h3标题</h3>
@@ -55,7 +56,10 @@
 			</div>
 			<div id="lvyou" class="images-shown nums fl"></div>
 		</div>
- 		<div class="demo">
+		<div class="demo">
+			<div id="qiyi0" class="images-shown"></div>
+		</div>
+<!--  		<div class="demo">
 			<div id="qiyi" class="images-shown"></div>
 		</div>
 		<div class="demo">
@@ -72,8 +76,8 @@
 		</div>
 		<div class="demo">
 			<div id="left" class="images-shown"></div>
-		</div>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+		</div> -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script>
     if(!window.jQuery)
     document.write('<script type="text/javascript" src="Scripts/libs/jquery/1.4.2/jquery.min.js"><'+'/script>');
@@ -82,7 +86,7 @@
 <script>
 $(function(){
 $('.images-shown').imageShown();
-
+$('#products').imageShown('build');
 $('#lvyou').imageShown('option',{
 	'navNum':8,
 	'navSpace':25,
@@ -90,6 +94,7 @@ $('#lvyou').imageShown('option',{
 	'pHeight':333,
 	'tContent':'num',
 	'tbgAnimate':false,
+	//'autoPlay':false,
 	'preload':true,
 	'tipsAnimate':'slide',
 'data':[
@@ -99,7 +104,7 @@ $('#lvyou').imageShown('option',{
 	'm':'厦门鼓浪屿风景之一。'
 },
 {
-	'b':'Content/images/IMG_1218.jpg',
+	'b':'Content/images/IMG_1218909.jpg',
 	'l':'',
 	'm':'厦门鼓浪屿风景之二'
 },
