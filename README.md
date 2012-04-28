@@ -5,8 +5,8 @@
  * @copyright       Copyright (c) 2012 gomesoft.com
  * @license         This imageShown jQuery plug-in is dual licensed under the MIT and GPL licenses.
  * @link            http://www.gomesoft.com
- * @docs            http://ethanzhu.github.com/jquery.imageShown/
- * @demo            http://ethanzhu.github.com/jquery.imageShown/Demo.html
+ * @docs            http://ethanzhu.github.com/jq.imageShown/
+ * @demo            http://ethanzhu.github.com/jq.imageShown/Demo.html
  * @version         Version 1.0
  * @email			pig.whose@gmail.com; 12377166@qq.com
  * 
@@ -23,70 +23,120 @@ Introduction:
 插件内部已经对请求的资源是否存在做了判断，例如出现错误你可以直接显示参数中你提供默认显示信息，同时你也可以在callback函数中对这个错误区域进行处理。
 
 
-callback函数你可以接收回传的参数，
+callback函数你可以接收回传的参数
+，
 回传参数的说明：
 id: //当前Dom的ID，在你页面未设置ID的情况下这个ID会是插件自动生成的唯一值。
+
 total//轮显内容的数量
+
 selected//当前选择的第一个内容区域，当你loop设置为false时此内容就是页面Dom中的index值，当loop为true时导航区域需要根据 attr('data-index')来获取当前的index。player区域不受loop限制，永远为当前内容的index值
+
 curNav//当前导航，可以通过 attr('data-missing')来确认内容是否正常加载。
+
 curPlay//当前显示的主要内容，可以通过 attr('data-missing')来确认内容是否正常加载。
+
 curData//你传入数据data的当前值。
+
 下一步开发计划：
+
 当你不愿意或者不会使用data参数时，你可以讲需要显示的内容按照固定格式写入html页面，然后使用 build命令由插件自行完成余下内容
+
 例如：
 	$('elem').imageShown('bulid');
+	
 	$('elem').imageShown('bulid',{'options'});
+	
 	$('elem').imageShown('bulid','option','value');
-提供外部暂停和重启自动播放的接口，方便你能够在回调函数中进行使用。
-提供更多的说明和示例。
+	
+提供外部暂停和重启自动播放的接口，方便你能够在回调函数中进行使用。提供更多的说明和示例。
 
 How to use:
+
 $('elem').imageShown({'options'});
+
 setter:
+
 $('elem').imageShown('option',{'options'});
 $('elem').imageShown('option','option','value');
+
 getter
+
 var option = $('elem').imageShown('option','option name');
 
 
 default options ：
+
 		id:	null,
+		
 		navSpace: 47, 
+		
 		pWidth: 0 , 
+		
 		pHeight:0 , 
+		
 		navNum: 4, 
+		
 		navPlace: null, 
+		
 		autoPlay: true, 
+		
 		autoTime: 4000, 
+		
 		events: 'mouseenter', 
+		
 		tbgAnimate: true, 
+		
 		tbgSpeed: 'fast', 
+		
 		addtional:false,
+		
 		step: 1, 
+		
 		scrollSpeed:'fast',
+		
 		opacity:0.6, 
+		
 		data: null, 
+		
 		loop: true, 
+		
 		player: true, 
+		
 		animate: 'fade',//left,right,top,bottom,fade,none
-		deepNav: false, 
+		
 		showTips: true, 
+		
 		tipsAnimate: 'fade',//fade,slide
+		
 		selected: 1, 
+		
 		callback: null, 
+		
 		preload: true, 
+		
 		target: '_blank', 
+		
 		pSpeed:500, 
+		
 		pType: false,
+		
 		tContent:'image',//num,none,image,content
+	
 		listPlace:null,
+		
 		tipsBtn:false, 
+		
 		loadClass: 'img-player-loading',
+		
 		pContent:'image'
     
 Future：
+
 	$('elem').imageShown('bulid');
+	
 	$('elem').imageShown('bulid',{'options'});
+	
 	$('elem').imageShown('bulid','option','value');
 	
 When you do not use the option of data, you want write them into html code, you can use 'build' command to generated data automatically.
