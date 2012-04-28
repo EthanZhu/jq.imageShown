@@ -461,7 +461,7 @@ $.extend(ImageShown.prototype, {
 			}
 			$t._thumbSelected(obj,inst);
 		}
-		inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._autoPlay(inst);},$t._g(inst,'autoTime')):null;
+		//inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._autoPlay(inst);},$t._g(inst,'autoTime')):null;
 	},
 	_stop: function(inst){
 		if(inst.timeOutID) clearTimeout(inst.timeOutID);
