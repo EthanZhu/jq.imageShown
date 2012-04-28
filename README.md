@@ -28,7 +28,8 @@ callback函数你可以接收回传的参数，
 id: //当前Dom的ID，在你页面未设置ID的情况下这个ID会是插件自动生成的唯一值。
 total//轮显内容的数量
 selected//当前选择的第一个内容区域，当你loop设置为false时此内容就是页面Dom中的index值，当loop为true时导航区域需要根据 attr('data-index')来获取当前的index。player区域不受loop限制，永远为当前内容的index值
-curMissing//用来标记，当前内容是否加载错误。true为加载错误，false为正常加载。
+curNav//当前导航，可以通过 attr('data-missing')来确认内容是否正常加载。
+curPlay//当前显示的主要内容，可以通过 attr('data-missing')来确认内容是否正常加载。
 curData//你传入数据data的当前值。
 下一步开发计划：
 当你不愿意或者不会使用data参数时，你可以讲需要显示的内容按照固定格式写入html页面，然后使用 build命令由插件自行完成余下内容

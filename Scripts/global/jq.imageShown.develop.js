@@ -684,7 +684,8 @@ $.extend(ImageShown.prototype, {
 			id: inst.id,
 			total:inst.total,
 			selected:inst.selected,
-			curMissing: inst.$currentli.attr('data-missing'),
+			curNav: this._indexAt(inst),
+			curPlayer: inst.$currentli,
 			curData: _data[_selected]? _data[_selected] : ''//image:_images[_selected]
 		}
 		inst.callDone = returnCall;
