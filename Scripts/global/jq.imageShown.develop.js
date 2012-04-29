@@ -6,7 +6,7 @@
  * @license         This imageShown jQuery plug-in is dual licensed under the MIT and GPL licenses.
  * @link            http://www.gomesoft.com
  * @docs            http://www.gomesoft.com/plugins/ethan/imageshown
- * @version         Version 1.0
+ * @version         Version 1.2
  * @email			pig.whose@gmail.com; 12377166@qq.com
  * 
  *
