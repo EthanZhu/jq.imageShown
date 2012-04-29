@@ -365,7 +365,7 @@ $.extend(ImageShown.prototype, {
 			_navNum = $t._g(inst,'navNum'),
 			_total = inst.total,
 			_step = $t._g(inst,'step');
-		_step = _step>=_total ? 1 : (_step>=_navNum ? parseInst(_navNum/2) : $t._g(inst,'step'));
+		_step = _step>=_total ? 1 : (_step>=_navNum ? parseInt(_navNum/2) : $t._g(inst,'step'));
 		
 		extendRemove(inst.settings,{'step': _step });
 		if(typeof _navNum=='string' && _navNum=='css'){
