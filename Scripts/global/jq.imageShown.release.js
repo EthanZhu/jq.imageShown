@@ -16,7 +16,7 @@ var PROP_NAME = 'imageShown';
 var imguuid = new Date().getTime();
 
 function ImageShown(){
-	this.debug = true;
+	this.debug = false;
 	this._blankImg = 'Content/images/blank.gif';
 	this.classes = [];
 	this.classes['']= {
