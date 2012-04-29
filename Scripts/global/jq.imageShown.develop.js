@@ -80,7 +80,7 @@ function ImageShown(){
 		tipsBtn:false, 
 		loadClass: 'img-player-loading',
 		pContent:'image',
-		missing:'内容加载错误'
+		missing:'Missing data.'
 	};
 	
 	$.extend(this._defaults, this.classes['']);
@@ -378,13 +378,13 @@ $.extend(ImageShown.prototype, {
 			inst.$scroll = '';inst.scrollOver = $t._g(inst,'_tover');
 		}
 		
-		var _selected = $t._g(inst,'selected');
-		if(_selected>inst.total) inst.selected = 0;
-		else inst.selected = _selected-1;
-		_selected = inst.selected;
-		if(_selected>0){
-			var aa = inst.data[_selected];
-			for(var i=_selected; i>0; i--){
+		var selected_ = $t._g(inst,'selected');
+		if(selected_>inst.total) inst.selected = 0;
+		else inst.selected = selected_-1;
+		selected_ = inst.selected;
+		if(selected_>0){
+			var aa = inst.data[selected_];
+			for(var i=selected_; i>0; i--){
 				inst.data[i]=inst.data[i-1];
 			}
 			inst.data[0]=aa;
@@ -401,7 +401,7 @@ $.extend(ImageShown.prototype, {
 				var $this = $(this), index = $this.attr('data-index');
 	            if (ev=='click') e.preventDefault();
 	            if(index!=inst.selected){
-	            	!addtional?$t._thumbSelected($this,inst):$t._thumbSelected($items.eq(index),inst)
+	            	!addtional?$t._curSelected($this,inst):$t._curSelected($items.eq(index),inst)
 	            }
 			});
 		},
@@ -423,37 +423,38 @@ $.extend(ImageShown.prototype, {
 			});
 		};
 		btnsHover();
-		$t._btnsNextClick(inst);
-		$t._btnsPrevClick(inst);
+		$t._nextClick(inst);
+		$t._preClick(inst);
 		bindItemEvent();
         var auto = $t._g(inst,'autoPlay'),loop = $t._g(inst,'loop');
         inst.$elem.hover(function() {
         	inst.hoverPause = true;
         	!loop? inst.clickSelected = inst.selected : '';
-			auto? $t._stop(inst):''
+			auto? $t._stop(inst.id):''
         },
         function() {
         	inst.hoverPause = false;
-          	if(auto) $t._start(inst);
+          	if(auto) $t._startAt(inst);
         });
-        $t._thumbSelected(null,inst);
-       	//$t._startAuto(inst);
+        $t._curSelected(null,inst);
+       	//$t._startPlay(inst);
 	},
-	_startAuto: function(inst){
+	_startPlay: function(id){
+		var inst = this._getInst($('#'+id)[0]);
 		var $t = this;
 		inst.timeOutID? clearTimeout(inst.timeOutID):'';
 		if(!inst.preLoad){
 			inst.timeOutID = null;
-			inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._autoPlay(inst);},$t._g(inst,'autoTime')):null;
+			inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._auto(inst);},$t._g(inst,'autoTime')):null;
 		}
 	},
-	_autoPlay: function(inst){
+	_auto: function(inst){
 		var $t = this;
 		if(inst.timeOutID&&!inst.preLoad){
 			var obj;
 			if($t._g(inst,'loop')){
-				inst._selected = inst._selected>=(inst.total-1)?0:++inst._selected;
-				obj = inst.$itemList.find('li').eq(inst._selected);
+				inst.selected_ = inst.selected_>=(inst.total-1)?0:++inst.selected_;
+				obj = inst.$itemList.find('li').eq(inst.selected_);
 				
 			}
 			else{
@@ -461,20 +462,18 @@ $.extend(ImageShown.prototype, {
 				obj = inst.$itemList.find('li').eq(inst.selected)
 				
 			}
-			$t._thumbSelected(obj,inst);
+			$t._curSelected(obj,inst);
 		}
-		//inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._autoPlay(inst);},$t._g(inst,'autoTime')):null;
+		//inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._auto(inst);},$t._g(inst,'autoTime')):null;
 	},
-	_stop: function(inst){
+	_stop: function(id){
+		var inst = this._getInst($('#'+id)[0]);
 		if(inst.timeOutID) clearTimeout(inst.timeOutID);
 	},
-	_start: function(inst){
-		this._startAt(inst);
-	},
 	_startAt: function(inst){
-		var $scroll=inst.$scroll, loop = this._g(inst,'loop'), space = this._g(inst,'navSpace'), position = this._g(inst,'navPlace'), 
-			seen = this._g(inst,'navNum'), thumbSeen = (seen-1)*space, bgAnimate = this._g(inst,'tbgAnimate');
-		var $selected = this._indexAt(inst), selectedPos = $selected.position();
+		var $t = this, $scroll=inst.$scroll, loop = $t._g(inst,'loop'), space = $t._g(inst,'navSpace'), position = $t._g(inst,'navPlace'), 
+			seen = $t._g(inst,'navNum'), thumbSeen = (seen-1)*space, bgAnimate = $t._g(inst,'tbgAnimate');
+		var $selected = $t._indexAt(inst), selectedPos = $selected.position();
 
 		if(loop){
 			selectedPos = position=='lr'? selectedPos.top : selectedPos.left;
@@ -483,7 +482,7 @@ $.extend(ImageShown.prototype, {
 					var scrollPos = position=='lr'? parseInt($scroll.css('top')):parseInt($scroll.css('left'));
 					scrollPos>thumbSeen? position=='lr'?$scroll.css('top',0):$scroll.css('left',0):'';
 				}
-				this._thumbSelected(null,inst);
+				$t._curSelected(null,inst);
 			}
 		}
 		else{
@@ -500,13 +499,13 @@ $.extend(ImageShown.prototype, {
 				}
 			}
 			else inst.clickSelected = inst.selected;
-			if(inst.clickSelected!=inst.selected) this._thumbSelected(null,inst);
+			if(inst.clickSelected!=inst.selected) $t._curSelected(null,inst);
 		}
 		
-		this._startAuto(inst);
+		$t._startPlay(inst.id);
 	},
 
-	_thumbSelected: function(obj,inst){
+	_curSelected: function(obj,inst){
 		var $t = this, 
 			speed = $t._g(inst,'tbgSpeed'),
 			overClass = inst.scrollOver, 
@@ -522,7 +521,7 @@ $.extend(ImageShown.prototype, {
 		dataIndex = obj.attr('data-index');
 		inst.firstPlay? (inst.selected = -1,inst.firstPlay=false) : '' ;
 		inst.selected = inst.clickSelected = dataIndex;
-		inst._selected = obj.index();
+		inst.selected_ = obj.index();
 		if(tc=='image'){
 			var $img = obj.find('img'), opacity = $t._g(inst,'opacity');
 			typeof $img[0]!='undefined'? $img.stop().animate({'opacity':1},'fast'):'';
@@ -556,14 +555,14 @@ $.extend(ImageShown.prototype, {
 	},
 	_resetSelected: function(inst){
 		var $t=this, bgAnimate=$t._g(inst,'tbgAnimate'),position=$t._g(inst,'navPlace'),bgSpeed=$t._g(inst,'tbgSpeed'),$scroll=inst.$scroll;
-		$t._scrollNext(inst,0,function(){$t._enabledBtnNext(inst);$t._disabledBtnPrev(inst);});
+		$t._scrollNext(inst,0,function(){$t._enabledNext(inst);$t._disabledPrev(inst);});
 		bgAnimate? (position=='lr'? 
 						  $scroll.animate({top:0},bgSpeed)
 						: $scroll.animate({left:0},bgSpeed)
 				   ): '';
 	},
 	
-	_setInfo: function(inst){
+	_setTipsInfo: function(inst){
 		var $t = this;
 		var tips = $t._g(inst,'showTips');
 		if(tips){
@@ -614,18 +613,32 @@ $.extend(ImageShown.prototype, {
 					}
 				};
 			var GTB = function(B,L,G,C){
-				if (typeof B=='string') return '<a class="'+C+' '+C+'-'+B+'" href="'+L+'" target="'+G+'"></a>';
+				var R = '<a class="'+C+'" href="'+L+'" target="'+G+'"></a>';
+				if (typeof B=='string') R = '<a class="'+C+' '+C+'-'+B+'" href="'+L+'" target="'+G+'"></a>';
 				else if (typeof B=='object'){
-					var L_,G_,C_,T_;
-					if(!isEmptyObject(B)){
-						L_ = B.l? B.l:L,
-						G_= B.t? B.t:G,
-						C_= B.c? C+'-'+B.c:C,
-						T_ = B.t_? B.t_:'';
-						return '<a class="'+C+' '+C_+'" href="'+L_+'" target="'+G_+'">'+T_+'</a>';
+					var L_,G_,C_,T_,D_,E_='';
+					var OB = function(Z,i){
+						if(!isEmptyObject(Z)){
+							L_ = Z.l? Z.l:L,
+							G_= Z.g? Z.g:G,
+							C_= Z.c? C+'-'+Z.c:C,
+							D_= Z.t? Z.t:'',
+							T_ = Z.t_? Z.t_:'';
+							return i&i>0 ? '<a class="'+C+' '+C+i+' '+C_+'" href="'+L_+'" target="'+G_+'" title="'+D_+'">'+T_+'</a>'
+									 	 : '<a class="'+C+' '+C_+'" href="'+L_+'" target="'+G_+'" title="'+D_+'">'+T_+'</a>'
+						}
+						else return R;
+					};
+					if(isArray(B)){
+						D=B.length;
+						for(var i=0; i<D; i++) E_ +=OB(B[i],i);
+						R = E_;
+					}
+					else{
+						R = OB(B);
 					}
 				}
-				else return '<a class="'+C+'" href="'+L+'" target="'+G+'"></a>';
+				return R;
 			};
 			var info = '',
 				h2_ = GT(thisInfo.t,_link,target),
@@ -680,29 +693,31 @@ $.extend(ImageShown.prototype, {
 		}
 		
 	},
-	_setCallback: function(inst){
-		var _data = inst.data, _selected = inst.selected,_images = inst.images;
-		var returnCall = {
-			id: inst.id,
-			total:inst.total,
-			selected:inst.selected,
-			curNav: this._indexAt(inst),
-			curPlayer: inst.$currentli,
-			curData: _data[_selected]? _data[_selected] : ''//image:_images[_selected]
-		}
-		inst.callDone = returnCall;
-	},
-	_display: function(inst,callback){
+	
+	_display: function(inst){
 		var $t = this;
-		$t._stop(inst);
+		var id = inst.id;
+		$t._stop(id);
 		var player = $t._g(inst,'player');
 		var callback = $t._g(inst,'callback');
-		callback? $t._setCallback(inst):'';
+		var setCallback = function(){
+			var data_ = inst.data, selected_ = inst.selected;
+			var returnCall = {
+				id: inst.id,
+				total:inst.total,
+				selected:inst.selected,
+				curNav: $t._indexAt(inst),
+				curPlayer: inst.$currentli,
+				curData: data_[selected_]? data_[selected_] : ''//image:_images[selected_]
+			}
+			inst.callDone = returnCall;
+		};
+		callback? setCallback(inst):'';
 		inst.preLoad = true;
 		if(!player){
 			callback? callback(inst.callDone):''
 			inst.preLoad = false;
-			if (!inst.hoverPause) $t._startAuto(inst);
+			if (!inst.hoverPause) $t._startPlay(id);
 		}
 		else{
 			var _animate = $t._g(inst,'animate'),$list=inst.$itemList,total = inst.total,
@@ -721,43 +736,42 @@ $.extend(ImageShown.prototype, {
 				},
 				dataIndex = inst.selected,
 				//var $li;
-				inst.$currentli = getList(dataIndex);
-			
-			$t._g(inst,'preload')?loadListImg(inst.$currentli):'';
+			inst.$currentli = getList(dataIndex);
+			var _$curli = inst.$currentli, _$played = inst.played;
+			$t._g(inst,'preload')?loadListImg(_$curli):'';
 			var speed = $t._g(inst,'pSpeed');
 			var pwidth = $t._g(inst,'pWidth'), pheight = $t._g(inst,'pHeight');
-			var completeIndex = inst.$currentli.index();
-			var $currentImg = inst.$currentli.find('img');
 			
-
 			var doPlayerAnimate = function(){
-				var _$curli = inst.$currentli, _$played = inst.played;
 				switch (_animate){
 					case 'fade':
-						$t._playWithFade(_$curli,speed,total,function(){inst.played = _$curli;});
+						$t._pf(_$curli,speed,total,function(){inst.played = _$curli;});
 						break;
 					case 'left':
-						$t._playLeftRight(_$curli,pwidth,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('left',pwidth);},'left');
+						$t._plr(_$curli,pwidth,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('left',pwidth);},'left');
 						break;
 					case 'right':
-						$t._playLeftRight(_$curli,pwidth,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('left',0-pwidth);});
+						$t._plr(_$curli,pwidth,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('left',0-pwidth);});
 						break;
 					case 'bottom':
-						$t._playDwonUp(_$curli,pheight,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('top',pheight);},'bottom');
+						$t._pbt(_$curli,pheight,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('top',pheight);},'bottom');
 						break;
 					case 'top':
-						$t._playDwonUp($curli,pheight,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('top',0-pheight);});
+						$t._pbt($curli,pheight,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('top',0-pheight);});
 						break;
 					default : _$curli.stop().css('opacity',1).show().siblings().css('opacity',0).hide();
 				}
-				if (!inst.hoverPause) $t._startAuto(inst);
-				$t._setInfo(inst);
+				if (!inst.hoverPause) $t._startPlay(id);
+				$t._setTipsInfo(inst);
 			};
 			$list.each(function(){
 				$(this).find('img').unbind();
 			});
 			
-			if(inst.completeImg[completeIndex]){
+			var complete = _$curli.index();
+			var $currentImg = _$curli.find('img');
+			
+			if(inst.completeImg[complete]){
 				inst.preLoad = false;
 				doPlayerAnimate();
 				callback? callback(inst.callDone):'';
@@ -783,12 +797,12 @@ $.extend(ImageShown.prototype, {
 				else{
 					loadFunc();
 				}
-				inst.completeImg.push($(this));
+				inst.completeImg[complete]=$currentImg;
 			}
 
 		}
 	},
-	_playLeftRight:function(obj,width,total,speed,fun,where){
+	_plr:function(obj,width,total,speed,fun,where){
 		var w_ = width, t_ = total ,s_ = speed, l, l_;
 		var f_ = fun||function(){};
 		where=='left'?(l=w_, l_=0-w_): (l=0-w_, l_=w_);
@@ -805,7 +819,7 @@ $.extend(ImageShown.prototype, {
 		if(obj.css('opacity')&& obj.css('opacity')<1) obj.css('opacity',1)
 		obj.stop(true,true).css({'z-index': t_ + 1,'left':l}).animate({'left':0},speed,f_);
 	},
-	_playDwonUp:function(obj,height,total,speed,fun,where){
+	_pbt:function(obj,height,total,speed,fun,where){
 		var h_ = height, t_ = total ,s_ = speed, top, top_;
 		var f_ = fun||function(){};
 		where=='bottom'?(top=h_,top_=0-h_): (top=0-h_,top_=h_);
@@ -822,7 +836,7 @@ $.extend(ImageShown.prototype, {
 		if(obj.css('opacity')&& obj.css('opacity')<1) obj.css('opacity',1)
 		obj.stop(true,true).css({'z-index': t_ + 1,'top':top}).animate({'top':0},speed,f_);
 	},
-	_playWithFade: function(obj,speed,total,fun){
+	_pf: function(obj,speed,total,fun){
 		var func = fun || function(){};
 		obj.siblings().each(function(index){$(this).css({'z-index':total-index});});
 		obj.siblings().stop().animate({'opacity':0},speed);
@@ -841,7 +855,7 @@ $.extend(ImageShown.prototype, {
         }
         return $find;
 	},
-	_btnsPrevClick: function(inst){
+	_preClick: function(inst){
 		if(!inst.$btnPrev||inst.$btnPrev=='') return;
 		var $t = this;
 		var space = $t._g(inst,'navSpace'),
@@ -933,7 +947,7 @@ $.extend(ImageShown.prototype, {
 			}
 		});
 	},
-	_btnsNextClick: function(inst){
+	_nextClick: function(inst){
 		if(!inst.$btnNext||inst.$btnNext=='') return;
 		var $t = this;
 		inst.$btnNext.bind('click',function(){
@@ -951,7 +965,7 @@ $.extend(ImageShown.prototype, {
 			loop = $t._g(inst,'loop'),
 			bgAnimate = $t._g(inst,'tbgAnimate');
 		if(!loop){
-			$t._enabledBtnNext(inst);
+			$t._enabledNext(inst);
 			var listPos = position=='lr'? parseInt($list.css('top')): parseInt($list.css('left')),
 				stepPos = space*step;
 				if(listPos===0) return;
@@ -962,8 +976,8 @@ $.extend(ImageShown.prototype, {
 			$t._scrollPrev( inst,
 						listScroll,
 						function(){
-							position=='lr'? (Math.abs(parseInt($list.css('top')))===0? $t._disabledBtnPrev(inst):'')
-												 : (Math.abs(parseInt($list.css('left')))===0? $t._disabledBtnPrev(inst):'');
+							position=='lr'? (Math.abs(parseInt($list.css('top')))===0? $t._disabledPrev(inst):'')
+												 : (Math.abs(parseInt($list.css('left')))===0? $t._disabledPrev(inst):'');
 							inst.btnClick = true;
 						}
 		        	 );
@@ -988,7 +1002,7 @@ $.extend(ImageShown.prototype, {
 			bgSpeed=$t._g(inst,'tbgSpeed'),
 			speed = $t._g(inst,'scrollSpeed');
 		if(!loop){
-			$t._enabledBtnPrev(inst);
+			$t._enabledPrev(inst);
 			var listPos = position=='lr'? parseInt($list.css('top')): parseInt($list.css('left')),
 				overPos = (total-seen)*space, stepPos = space*step, listScroll;
 			if(Math.abs(listPos)===overPos) return;
@@ -998,8 +1012,8 @@ $.extend(ImageShown.prototype, {
 			$t._scrollNext( inst,
 							listScroll,
 							function(){
-								position=='lr'? (Math.abs(parseInt($list.css('top')))===(total - seen) * space? $t._disabledBtnNext(inst):'')
-													 : (Math.abs(parseInt($list.css('left')))===(total - seen) * space? $t._disabledBtnNext(inst):'');
+								position=='lr'? (Math.abs(parseInt($list.css('top')))===(total - seen) * space? $t._disabledNext(inst):'')
+													 : (Math.abs(parseInt($list.css('left')))===(total - seen) * space? $t._disabledNext(inst):'');
 								inst.btnClick = true;
 							}
 			        	 );
@@ -1023,7 +1037,7 @@ $.extend(ImageShown.prototype, {
 			               				});
 			               				if(!btnClick){
 			               					var _$selected = $t._indexAt(inst);
-		          							inst._selected = _$selected.index();
+		          							inst.selected_ = _$selected.index();
 		          						}
 			               			}
 			                });
@@ -1059,7 +1073,7 @@ $.extend(ImageShown.prototype, {
 			               				
 			               				if(!btnClick){
 			               					var _$selected = $t._indexAt(inst);
-		          							inst._selected = _$selected.index();
+		          							inst.selected_ = _$selected.index();
 			               				}			
 			               			}
 	                        });
@@ -1102,15 +1116,15 @@ $.extend(ImageShown.prototype, {
             	position=='lr'? $list.animate({top: distance},speed, func):$list.animate({left: distance},speed, func)
             }
     },
-   	_enabledBtnPrev: function(inst){
+   	_enabledPrev: function(inst){
 		var _active = this._g(inst,'_active');
 		if(!inst.$btnPrev.hasClass(_active)) inst.$btnPrev.addClass(_active);
 	},
-	_enabledBtnNext: function(inst){
+	_enabledNext: function(inst){
 		var _active = this._g(inst,'_active');
 		if(!inst.$btnNext.hasClass(_active)) inst.$btnNext.addClass(_active);
 	},
-	_disabledBtnPrev: function(inst){
+	_disabledPrev: function(inst){
 		var _active = this._g(inst,'_active');
 		var _hover = this._g(inst,'_hover');
 		var _prev = inst.$btnPrev;
@@ -1119,7 +1133,7 @@ $.extend(ImageShown.prototype, {
 			if(_prev.hasClass(_hover)) _prev.removeClass(_hover);
 		} 
 	},
-	_disabledBtnNext: function(inst){
+	_disabledNext: function(inst){
 		var _active = this._g(inst,'_active');
 		var _hover = this._g(inst,'_hover');
 		var _next = inst.$btnNext;
@@ -1143,7 +1157,7 @@ $.extend(ImageShown.prototype, {
 			hoverPause:false,
 			preLoad:true,
 			selected:0,
-			_selected:0,
+			selected_:0,
 			timeOutID:null,
 			$currentli:null,
 			clickSelected:0, 

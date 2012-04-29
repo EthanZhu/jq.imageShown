@@ -15,7 +15,7 @@ $.fn.extend($.imageShown,{
 		
 		var buildData = function(A,T,L,W){
 			typeof L[0]!='undefined'? (L= L.html(),L.charAt(L.length - 1)!='/'? L +='/':''):'';
-			if(T=='num'||T=='none') return
+			if(W!='play'&&(T=='num'||T=='none')) return '""';
 			var B,C,D,H,I,data=[],J,hf;
 			if(T!='hgroup'&T!='btn'&&T!='ot'){
 				B = A.find('a:first'), C = A.find('img'),
@@ -30,7 +30,7 @@ $.fn.extend($.imageShown,{
 					typeof I!='undefined'?(
 						data.push('"p":"'+I.src+'"'),
 						I.alt? data.push('"a":"'+I.alt+'"'):'',
-						W!='big'?(I.width? data.push('"w":"'+I.width+'"'):'',I.height? data.push('"h":'+'"'+I.height+'"'):''):''
+						W!='play'?(I.width? data.push('"w":"'+I.width+'"'):'',I.height? data.push('"h":'+'"'+I.height+'"'):''):''
 			
 					):''
 				);
@@ -60,13 +60,13 @@ $.fn.extend($.imageShown,{
 					//D==1? data.push('"{"'):data.push('"[{"');
 					D==1? '':data.push('[');
 					for (J=0;J<D;J++){
-						//'b_':'tv',//{'c':'','l':'','t':'','t_':''} class, link, target, text
+						//'b_':'tv',//{'c':'','l':'','g','t':'','t_':''} class, link,target, title, text
 						data.push('{');
 						H = B.eq(J),I = H[0]
 						hf=I.href;
 						I.className!=''? data.push('"c":"'+I.className+'"'):'';
 						hf.charAt(hf.length - 1)!='/'? hf +='/':''
-						hf!=L ? (data.push('"l":"'+hf+'"'),I.target? data.push('"t":'+'"'+I.target+'"'):''):'';
+						hf!=L ? (data.push('"l":"'+hf+'"'),I.target? data.push('"g":'+'"'+I.target+'"'):'',I.title? data.push('"t":'+'"'+I.title+'"'):''):'';
 						H.html()!=''? data.push('"t_":"'+H.html()+'"'):'';
 						data.push('}')
 					}
@@ -116,17 +116,19 @@ $.fn.extend($.imageShown,{
 			thisContent.push('{');
 			typeof $l[0]!='undefined'?$thisNav = $l.eq(i):'';
 			typeof $p[0]!='undefined'?$thisPlay = $p.eq(i):'';
+			//console.log($thisNav);
 			if($thisNav){
 				glink = $thisNav.find('p.global-link');
 				typeof glink[0]!='undefined' ? thisContent.push('"l":'+'"'+glink.html()+'"'):''
 				$content = $thisNav.find('p.this-content');
+				//console.log(n);
 				content = typeof $content[0]!='undefined'?buildData($content, n, glink):'""';
 				thisContent.push('"s":'+ content);
 			}
 			if($thisPlay&&player){
-				typeof glink[0]=='undefined'? (glink = $thisPlay.find('p.global-link'),typeof glink[0]!='undefined' ? thisContent.push('"l":'+'"'+glink.html()+'"'):''):'';
+				!glink||typeof glink[0]=='undefined'? (glink = $thisPlay.find('p.global-link'),typeof glink[0]!='undefined' ? thisContent.push('"l":'+'"'+glink.html()+'"'):''):'';
 				$content = $thisPlay.find('p.this-content');
-				content = typeof $content[0]!='undefined'?buildData($content, n, glink, 'big'):'""';
+				content = typeof $content[0]!='undefined'?buildData($content, n, glink, 'play'):'""';
 				thisContent.push('"b":'+ content);
 				if(tips){
 					$tips = $thisPlay.find('label'),$H2 = $tips.find('h2'), $H3 = $tips.find('h3');
@@ -153,17 +155,16 @@ $.fn.extend($.imageShown,{
 				}
 			}
 			thisContent.push('}');
-			content = thisContent.join(",").replace(/{,/g,"{").replace(/,}/g,"}").replace(/\[,/g,"[").replace(/,]/g,"]").replace(/:,/g,":");
+			content = thisContent.join(",")
 			mainData.push(content);
 		}
-		var thisData = eval('['+mainData.join(",")+']');
+		thisData = mainData.join(',').replace(/([{\[:]),/g,'$1').replace(/,([}\]])/g,'$1');
+		$t.debug? $('<div />').css('padding','30px').html('Builded data:<br/>['+thisData+']').prependTo($('body')):'';
+		var thisData = eval('['+thisData+']');
 		a.data = [];
-		
-		// alert(typeof thisData);
 		var thisLength = thisData.length, self;
 		for(var i=0;i<thisLength;i++){
 			self = thisData[i];
-			// console.log(self);
 			if(!$t._isEmptyObject(self)) a.data.push(self)
 		}
 		a.data?	$t._updateImageShown(a):'';

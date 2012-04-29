@@ -1,7 +1,7 @@
 /******************************************
  * gomesoft.com
  *
- * @author          Ethan.zhu (zhuyidong）
+ * @author          Ethan.zhu（zhuyidong）
  * @copyright       Copyright (c) 2012 gomesoft.com
  * @license         This imageShown jQuery plug-in is dual licensed under the MIT and GPL licenses.
  * @link            http://www.gomesoft.com
@@ -44,7 +44,7 @@ function ImageShown(){
 		_tbtn:'img-tips-btn',
 		_ptype:'img-player-type',
 		_addtional:'img-thumb-addtional',
-		_clear:'clearfix'
+		_missing: 'img-load-missing'
 	};
 	this._defaults = {
 		id:	null,
@@ -71,23 +71,23 @@ function ImageShown(){
 		tipsAnimate: 'fade',//fade,slide
 		selected: 1, 
 		callback: null, 
-		preloading: true, 
+		preload: true, 
 		target: '_blank', 
 		pSpeed:500, 
 		pType: false,
-		tType:'image',//num,none,image,content
+		tContent:'image',//num,none,image,content
 		listPlace:null,
 		tipsBtn:false, 
 		loadClass: 'img-player-loading',
-		pContent:null
+		pContent:'image',
+		missing:'Missing data.'
 	};
 	
 	$.extend(this._defaults, this.classes['']);
 }
 $.extend(ImageShown.prototype, {
-	_a: 'hasImageShown',
-	//log
-	_b: function () {
+	marker: 'hasImageShown',
+	log: function () {
 		if (this.debug)
 			console.log.apply('', arguments);
 	},
@@ -95,112 +95,98 @@ $.extend(ImageShown.prototype, {
 		extendRemove(this._defaults, settings || {});
 		return this;
 	},
-	_instImageShown: function(b, c) {
-		var id = b.id;
-		var $elem = $(b);
-		var d = null;
-		for (var e in this._defaults) {
-			var f = b.getAttribute('date:' + e);
-			if (f) {
-				d = d || {};
+	_instImageShown: function(elem, settings) {
+		var id = elem.id;
+		var $elem = $(elem);
+		var inlineSettings = null;
+		for (var attrName in this._defaults) {
+			var attrValue = elem.getAttribute('date:' + attrName);
+			if (attrValue) {
+				inlineSettings = inlineSettings || {};
 				try {
-					d[e] = eval(f);
+					inlineSettings[attrName] = eval(attrValue);
 				} catch (err) {
-					d[e] = f;
+					inlineSettings[attrName] = attrValue;
 				}
 			}
 		}
 		if (!id) {
 			this.uuid += 1;
-			b.id = 'img' + this.uuid;
+			elem.id = 'img' + this.uuid;
 		}
-		this._defaults.id = b.id;
-		var a = this._newInst($(b));
-		a.settings = $.extend({}, c || {}, d || {});
+		this._defaults.id = elem.id;
+		var inst = this._newInst($(elem));
+		inst.settings = $.extend({}, settings || {}, inlineSettings || {});
 		
-		if ($elem.hasClass(this._a)) return;
-		$elem.addClass(this._a);
-		$.data(b, PROP_NAME, a);
-		this._updateImageShown(a);
+		if ($elem.hasClass(this.marker)) return;
+		$elem.addClass(this.marker);
+		$.data(elem, PROP_NAME, inst);
+		this._updateImageShown(inst);
 	
 	},
-	_updateImageShown: function(a){
+	
+	_updateImageShown: function(inst){
+		//console.log('_updateImageShown');
 		var $t = this;
-		a.firstPlay = false;
-		if($t._g(a,'player')){
-			a.$player = $('<div class="'+$t._g(a,'_player')+'" />');
-			if($t._g(a,'preloading')){
-				var b = $t._g(a,'loadClass');
-				if(!a.$player.hasClass(b)) a.$player.addClass(b);
+		inst.firstPlay = false;
+		if($t._g(inst,'player')){
+			inst.$player = $('<div class="'+$t._g(inst,'_player')+'" />');
+			if($t._g(inst,'preload')){
+				var _loading = $t._g(inst,'loadClass');
+				if(!inst.$player.hasClass(_loading)) inst.$player.addClass(_loading);
 			}
-			else if(a.$player.hasClass(b)) a.$player.removeClass(b);
-			$('<ul class="'+ $t._g(a,'_plist') +'" />').appendTo(a.$player);
+			else if(inst.$player.hasClass(_loading)) inst.$player.removeClass(_loading);
+			$('<ul class="'+ $t._g(inst,'_plist') +'" />').appendTo(inst.$player);
 		} 
 		else{
-			a.$player = '';
+			inst.$player = '';
 		}
-		//console.log(this._g(a,'_thumbnail'));
-		a.$nav = $('<div class="'+$t._g(a,'_thumb')+'" />');
-		a.$btnPrev = $('<div class="'+$t._g(a,'_btn')+'"><span class="'+$t._g(a,'_btnPrev')+'" />');
-		a.$btnNext = $('<div class="'+$t._g(a,'_btn')+' '+$t._g(a,'_aside')+'"><span class="'+$t._g(a,'_btnNext')+'" />');
-		a.$navList = $('<div class="'+$t._g(a,'_tlist')+'" />');
-		a.$itemList = $('<ul class="'+$t._g(a,'_items')+' '+$t._g(a,'_clear')+'" />');
+		//console.log(this._g(inst,'_thumbnail'));
+		inst.$nav = $('<div class="'+$t._g(inst,'_thumb')+'" />');
+		inst.$btnPrev = $('<div class="'+$t._g(inst,'_btn')+'"><span class="'+$t._g(inst,'_btnPrev')+'" />');
+		inst.$btnNext = $('<div class="'+$t._g(inst,'_btn')+' '+$t._g(inst,'_aside')+'"><span class="'+$t._g(inst,'_btnNext')+'" />');
+		inst.$navList = $('<div class="'+$t._g(inst,'_tlist')+'" />');
+		inst.$itemList = $('<ul class="'+$t._g(inst,'_items')+'" />');
 		
-		if($t._g(a,'showTips')){
-			a.$tipsBg = $('<div class="'+$t._g(a,'_tbackground')+'" />');
-			a.$tipsInfo = $('<div class="'+$t._g(a,'_tinfo')+'">');
+		if($t._g(inst,'showTips')){
+			inst.$tipsBg = $('<div class="'+$t._g(inst,'_tbackground')+'" />');
+			inst.$tipsInfo = $('<div class="'+$t._g(inst,'_tinfo')+'">');
 		}
 		else{
-			a.$tipsBg = '';a.$tipsInfo = '';
+			inst.$tipsBg = '';inst.$tipsInfo = '';
 		}
-		var m = $t._g(a,'data'), n = a.data;
-		if(m&&!n){
-			a.data = [];
-			var ml = m.length, f;
-			for(var i=0;i<ml;i++){
-				f = m[i];
-				if(!isEmptyObject(self)) a.data.push(f)
+		var thisData = $t._g(inst,'data');
+		var instData = inst.data;
+		if(thisData&&!instData){
+			inst.data = [];
+			var thisLength = thisData.length, self;
+			for(var i=0;i<thisLength;i++){
+				self = thisData[i];
+				if(!isEmptyObject(self)) inst.data.push(self)
 			}
 		}
-		if (n&&m){
-			var il = n.length, ml = m.length, f;
-			for(var i=0;i<ml;i++){
-				self = m[i];
-				if(!isEmptyObject(f)){
-					if(i<il) a.data[i] = f;
-					else a.data.push(f);
+		if (instData&&thisData){
+			var instLength = instData.length, thisLength = thisData.length, self;
+			for(var i=0;i<thisLength;i++){
+				self = thisData[i];
+				if(!isEmptyObject(self)){
+					if(i<instLength) inst.data[i] = self;
+					else inst.data.push(self);
 				}
 			}
 		}
-		a.completeImg = [];
-		var d = a.data;
-		if(d&&isArray(d)){//data is not null and data is an array
-			a.total = d.length;
-			$t._updeteOptions(a);
-			$t._instHtml(a);
-			$t._initEvents(a);
+		inst.completeImg = [];
+		var data = inst.data;
+		// data?$t.log(data[0]):"";
+		// console.log(isArray(data));
+		if(data&&isArray(data)){//data is not null and data is an array
+			//console.log(data);
+			inst.total = data.length;
+			$t._updeteOptions(inst);
+			$t._instHtml(inst);
+			$t._initEvents(inst);
 		}
 
-	},
-	_getProperty: function(A,B,C,W,H){
-		var a, b, c, d, w_, h_, f;
-		w_ = W||'', h_=H||'';
-		if(typeof A=='string'){
-			b=A, a=B, c=C, d='';
-		}
-		else{
-			f= isArray(A)? A[0]: A;
-			!$.isEmptyObject(f)? (
-				a = f.l ? f.l : B,
-				b = f.p ? f.p : '',
-				c = f.t ? f.t : C,
-				d = f.a ? f.a : '',
-				w_ = f.w ? f.w : w_,
-				h_ = f.h ? f.h : h_
-			):'';
-		}
-		if(b) return {l:a, p: b, t: c, a: d, h:h_, w:w_};
-		else return 'nothing';
 	},
 	_instHtml:function(a){
 		var $t=this, 
@@ -225,56 +211,76 @@ $.extend(ImageShown.prototype, {
 			load = $t._g(a,'preload'), 
 			p_ = $t._g(a,'player');
 		a.images=[];
-		var GI = function(A,L,W,C,I){
-			var i_, g_, $i, c;
-			W=='play'? (i_=$t._getProperty(A.b,L,t,w,h) , c=p)
-						: (i_=$t._getProperty(A.s,L,t), c=m);
-			i_!='nothing'?(
-				i_.w&&i_.h&&i_.w!=''&&i_.h!='' ? (g_ = load ? ('data-origital="'+i_.p+'" width="'+i_.w+'" height="'+i_.h+'" src="'+$t._blankImg+'"') : ('width="'+i_.w+'" height="'+i_.h+'" src="'+i_.p+'"'))
-											   : (g_ = load ? ('data-origital="'+i_.p+'" src="'+$t._blankImg+'"') :('src="'+i_.p+'"'))
-				,
-				$i = $(['<li class="'+ c +'"><a href="'+ i_.l +'" target="'+ i_.t +'"><img '+ g_ +' alt="'+ i_.a +'" /></a></li>'].join(""))
-			):(
-				$i = $(['<li class="'+ c +'">Need image here.</li>'].join(""))
-			);
-			C ? $i.css({'z-index': t_- I, opacity: 0}):'';
-			return $i;
-		},
-		GC = function(C, L, W){
-			var $C, $H, c =	W =='nav'? m : p;
-			if (typeof C=='string'){
-				$C = $('<div>'+C+'</div>');
-				$H = $C.find('a');
-				$C = $H.size()>0? ($H.attr('target',t),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
-								: $(['<li class="'+ c +'"><a href="'+L+'" target="'+t+'">'+C+'</a></li>'].join(""));
-			} 
-			else if(typeof C=='object'){
-				if(!isEmptyObject(C)){
-					var l_= C.l? C.l:l, g_= C.t? C.t:t, c_= C.p;
-					$C = $('<div>'+c_+'</div>');
+		var GP = function(A,B,C,W,H){
+				var a, b, c, d, w_, h_, f;
+				w_ = W||'', h_=H||'';
+				if(typeof A=='string'){
+					b=A, a=B, c=C, d='';
+				}
+				else{
+					f= isArray(A)? A[0]: A;
+					!$.isEmptyObject(f)? (
+						a = f.l ? f.l : B,
+						b = f.p ? f.p : '',
+						c = f.t ? f.t : C,
+						d = f.a ? f.a : '',
+						w_ = f.w ? f.w : w_,
+						h_ = f.h ? f.h : h_
+					):'';
+				}
+				if(b) return {l:a, p: b, t: c, a: d, h:h_, w:w_};
+				else return 'nothing';
+			},
+			GI = function(A,L,W,C,I){
+				var i_, g_, $i, c;
+				W=='play'? (i_=GP(A.b,L,t,w,h) , c=p)
+							: (i_=GP(A.s,L,t), c=m);
+				i_!='nothing'?(
+					i_.w&&i_.h&&i_.w!=''&&i_.h!='' ? (g_ = load ? ('<img data-origital="'+i_.p+'" width="'+i_.w+'" height="'+i_.h+'" src="'+$t._blankImg+'" alt="'+ i_.a +'" />') : ('<img width="'+i_.w+'" height="'+i_.h+'" src="'+i_.p+'" alt="'+ i_.a +'" />') )
+												   : (g_ = load ? ('<img data-origital="'+i_.p+'" src="'+$t._blankImg+'" alt="'+ i_.a +'" />') : ('<img src="'+i_.p+'" alt="'+ i_.a +'" />')),
+					$i = $(['<li class="'+ c +'"><a href="'+ i_.l +'" target="'+ i_.t +'">'+g_+'</a></li>'].join(""))
+				):(
+					$i = $(['<li class="'+ c +'">Missing data.</li>'].join(""))
+				);
+				C ? $i.css({'z-index': t_- I, opacity: 0}):'';
+				if(!load) $(g_).load(function(){$i.attr('data-missing','false')}).error(function(){$i.attr('data-missing','true');$i.html('<p class="'+$t._g(a,'_missing')+'">'+$t._g(a,'missing')+'</p>');});
+				return $i;
+			},
+			GC = function(C, L, W){
+				var $C, $H, c =	W =='nav'? m : p;
+				if (typeof C=='string'){
+					$C = $('<div>'+C+'</div>');
 					$H = $C.find('a');
-					$C = $H.size()>0? ($H.attr('target',g_),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
-									: $(['<li class="'+ c +'"><a href="'+ l_ +'" target="'+ g_ +'">'+ c_ +'</a></li>'].join(""));
-				}
-			}
-			return $C;
-			$C = $H = null;
-		},
-		ST = function(D,T){
-			for(i=0; i<t_; i++){
-				f = D[i], l = f.l;//global link
-				if(!isEmptyObject(f)){
-					switch (T){
-						case 'image':n = GI(f,l);break;
-						case 'num':n = $(['<li class="'+m+'"><span>'+(i+1)+'</span></li>'].join(""));break;
-						case 'content':n = GC(f.s,l,'nav');break;
-						default : n = $(['<li class="'+ m +'"><span>&nbsp;</span></li>'].join(""));
+					$C = $H.size()>0? ($H.attr('target',t),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
+									: $(['<li class="'+ c +'"><a href="'+L+'" target="'+t+'">'+C+'</a></li>'].join(""));
+				} 
+				else if(typeof C=='object'){
+					if(!isEmptyObject(C)){
+						var l_= C.l? C.l:l, g_= C.t? C.t:t, c_= C.p;
+						$C = $('<div>'+c_+'</div>');
+						$H = $C.find('a');
+						$C = $H.size()>0? ($H.attr('target',g_),$(['<li class="'+ c +'">'+$C.html()+'</li>'].join("")))
+										: $(['<li class="'+ c +'"><a href="'+ l_ +'" target="'+ g_ +'">'+ c_ +'</a></li>'].join(""));
 					}
-					n.attr('data-index', i);
-					n.appendTo(a.$itemList)
 				}
-			}
-		};
+				return $C;
+				$C = $H = null;
+			},
+			ST = function(D,T){
+				for(i=0; i<t_; i++){
+					f = D[i], l = f.l;//global link
+					if(!isEmptyObject(f)){
+						switch (T){
+							case 'image':n = GI(f,l);break;
+							case 'num':n = $(['<li class="'+m+'"><span>'+(i+1)+'</span></li>'].join(""));break;
+							case 'content':n = GC(f.s,l,'nav');break;
+							default : n = $(['<li class="'+ m +'"><span>&nbsp;</span></li>'].join(""));
+						}
+						n.attr('data-index', i);
+						n.appendTo(a.$itemList)
+					}
+				}
+			};
 		if(p_){
 			var c = $t._g(a,'pContent');
 			for(i=0; i<t_; i++){
@@ -349,370 +355,373 @@ $.extend(ImageShown.prototype, {
 				case 'bottom':$p.css({'top':h,'opacity':1});break;
 			}
 		}
+
 	},
-	_updeteOptions: function(a){
-		var $t = this,
-			b = $t._g(a,'navNum'),
-			t = a.total,
-			s = $t._g(a,'step');
-		s= s>=t ? 1 :(s>b ? parseInt(b/2): $t._g(a,'step'));
+	_updeteOptions: function(inst){
+		var $t = this ,
+			_navNum = $t._g(inst,'navNum'),
+			_total = inst.total,
+			_step = $t._g(inst,'step');
+		_step = _step>=_total ? 1 : (_step>=_navNum ? parseInst(_navNum/2) : $t._g(inst,'step'));
 		
-		extendRemove(a.settings,{'step': s });
-		
-		if(typeof b=='string' && b=='css'){
-			extendRemove(a.settings,{'loop':false,'tbgAnimate':false });
-			a.$btnPrev =  a.$btnNext = '';
+		extendRemove(inst.settings,{'step': _step });
+		if(typeof _navNum=='string' && _navNum=='css'){
+			extendRemove(inst.settings,{'loop':false,'tbgAnimate':false });
+			inst.$btnPrev =  inst.$btnNext = '';
 		}
 		
-		if($t._g(a,'tbgAnimate')) {
-			a.$scroll = $('<div class="'+$t._g(a,'_scroll')+'" />');
-			a.scrollOver = $t._g(a,'_sover');
+		if($t._g(inst,'tbgAnimate')) {
+			inst.$scroll = $('<div class="'+$t._g(inst,'_scroll')+'" />');
+			inst.scrollOver = $t._g(inst,'_sover');
 		}
 		else{
-			a.$scroll = ''; a.scrollOver = $t._g(a,'_tover');
+			inst.$scroll = '';inst.scrollOver = $t._g(inst,'_tover');
 		}
 		
-		var c = $t._g(a,'selected');
-		if(c>t) a.selected = 0;
-		else a.selected = c-1;
-		c = a.selected;
-		if(c>0){
-			var aa = a.data[c];
-			for(var i=c; i>0; i--){
-				a.data[i]=a.data[i-1];
+		var selected_ = $t._g(inst,'selected');
+		if(selected_>inst.total) inst.selected = 0;
+		else inst.selected = selected_-1;
+		selected_ = inst.selected;
+		if(selected_>0){
+			var aa = inst.data[selected_];
+			for(var i=selected_; i>0; i--){
+				inst.data[i]=inst.data[i-1];
 			}
-			a.data[0]=aa;
-			a.selected = 0;
+			inst.data[0]=aa;
+			inst.selected = 0;
 		}
 	},
-	_btnsHover: function(a){
-		var $t=this,$b;
-		$b = a.$nav.find('.'+$t._g(a,'_btn'));
-		a.$nav = null;
-		var b = $t._g(a,'_active');
-		var c = $t._g(a,'_hover');
-		var d = $t._g(a,'_aside');
-		if($b) $b.addClass(b);
-		if(!$t._g(a,'loop')){
-			if((a.selected+1) <= $t._g(a,'navNum')) {
-				 $b.each(function(){
-					 var $ts = $(this);
-					 $ts.hasClass(d)? $ts.addClass(b): $ts.removeClass(b);
-				})
-			}
-		}
-		$b.hover(function(){
-				var $ts = $(this);
-				if($ts.hasClass(b)) $ts.addClass(c);
-			},function(){
-				var $ts = $(this);
-				if($ts.hasClass(b)&&$ts.hasClass(c)) $ts.removeClass(c);
-		});
-	},
-	_initEvents: function(a){
+	
+	_initEvents: function(inst){
 		var $t = this;
-		$t._btnsHover(a);
-		$t._btnsNextClick(a);
-		$t._btnsPrevClick(a);
-		$t._bindItemEvent(a);
-        var auto = $t._g(a,'autoPlay'),loop = $t._g(a,'loop');
-        a.$elem.hover(function() {
-        	a.hoverPause = true;
-        	!loop? a.clickSelected = a.selected : '';
-			auto? $t._stop(a):''
+		var bindItemEvent = function(){
+			var tag = $t._g(inst,'navNum'), addtional =$t._g(inst,'addtional'), $list= inst.$itemList, $items = $list.find('li'), ev = $t._g(inst,'events');
+			if(tag=='css' && addtional) $list = inst.$addtional.find('ul');
+			$list.delegate('li.',ev,function(e){
+				var $this = $(this), index = $this.attr('data-index');
+	            if (ev=='click') e.preventDefault();
+	            if(index!=inst.selected){
+	            	!addtional?$t._curSelected($this,inst):$t._curSelected($items.eq(index),inst)
+	            }
+			});
+		},
+		btnsHover= function(){
+			var $arrows = inst.$nav.find('.'+$t._g(inst,'_btn'));
+			inst.$nav = null;
+			var _active = $t._g(inst,'_active');
+			var _hover = $t._g(inst,'_hover');
+			var _aside = $t._g(inst,'_aside');
+			if($arrows) $arrows.addClass(_active);
+			if(!$t._g(inst,'loop')){
+				if((inst.selected+1) <= $t._g(inst,'navNum'))
+					$arrows.each(function(){ var $ts = $(this); $ts.hasClass(_aside)? $ts.addClass(_active): $ts.removeClass(_active);});
+			}
+			$arrows.hover(function(){
+					var $ts = $(this); if($ts.hasClass(_active)) $ts.addClass(_hover);
+				},function(){
+					var $ts = $(this); if($ts.hasClass(_active)&&$ts.hasClass(_hover)) $ts.removeClass(_hover);
+			});
+		};
+		btnsHover();
+		$t._nextClick(inst);
+		$t._preClick(inst);
+		bindItemEvent();
+        var auto = $t._g(inst,'autoPlay'),loop = $t._g(inst,'loop');
+        inst.$elem.hover(function() {
+        	inst.hoverPause = true;
+        	!loop? inst.clickSelected = inst.selected : '';
+			auto? $t._stop(inst.id):''
         },
         function() {
-        	a.hoverPause = false;
-          	if(auto) $t._start(a);
+        	inst.hoverPause = false;
+          	if(auto) $t._startAt(inst);
         });
-        $t._thumbSelected(null,a);
-       	//$t._startAuto(inst);
+        $t._curSelected(null,inst);
+       	//$t._startPlay(inst);
 	},
-	_startAuto: function(a){
+	_startPlay: function(id){
+		var inst = this._getInst($('#'+id)[0]);
 		var $t = this;
-		a.timeOutID? clearTimeout(a.timeOutID):'';
-		if(!a.preLoad){
-			a.timeOutID = null;
-			a.timeOutID = $t._g(a,'autoPlay')? setTimeout(function(){$t._autoPlay(a);},$t._g(a,'autoTime')):null;
+		inst.timeOutID? clearTimeout(inst.timeOutID):'';
+		if(!inst.preLoad){
+			inst.timeOutID = null;
+			inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._auto(inst);},$t._g(inst,'autoTime')):null;
 		}
 	},
-	_autoPlay: function(a){
+	_auto: function(inst){
 		var $t = this;
-		if(a.timeOutID&&!a.preLoad){
+		if(inst.timeOutID&&!inst.preLoad){
 			var obj;
-			if($t._g(a,'loop')){
-				a._selected = a._selected>=(a.total-1)?0:++a._selected;
-				obj = a.$itemList.find('li').eq(a._selected);
+			if($t._g(inst,'loop')){
+				inst.selected_ = inst.selected_>=(inst.total-1)?0:++inst.selected_;
+				obj = inst.$itemList.find('li').eq(inst.selected_);
 				
 			}
 			else{
-				a.selected = a.selected>=(a.total-1)?0:++a.selected;
-				obj = a.$itemList.find('li').eq(a.selected)
+				inst.selected = inst.selected>=(inst.total-1)?0:++inst.selected;
+				obj = inst.$itemList.find('li').eq(inst.selected)
 				
 			}
-			$t._thumbSelected(obj,a);
+			$t._curSelected(obj,inst);
 		}
-		a.timeOutID = $t._g(a,'autoPlay')? setTimeout(function(){$t._autoPlay(a);},$t._g(a,'autoTime')):null;
+		//inst.timeOutID = $t._g(inst,'autoPlay')? setTimeout(function(){$t._auto(inst);},$t._g(inst,'autoTime')):null;
 	},
-	_stop: function(a){
-		if(a.timeOutID) clearTimeout(a.timeOutID);
+	_stop: function(id){
+		var inst = this._getInst($('#'+id)[0]);
+		if(inst.timeOutID) clearTimeout(inst.timeOutID);
 	},
-	_start: function(a){
-		this._startAt(a);
-	},
-	_startAt: function(a){
-		var $t = this, $s=a.$scroll, b = $t._g(a,'loop'), c = $t._g(a,'navSpace'), d = $t._g(a,'navPlace'), 
-			e = $t._g(a,'navNum'), f = (e-1)*c, g = $t._g(a,'tbgAnimate');
-		var $st = $t._indexAt(a), h = $st.position();
+	_startAt: function(inst){
+		var $t = this, $scroll=inst.$scroll, loop = $t._g(inst,'loop'), space = $t._g(inst,'navSpace'), position = $t._g(inst,'navPlace'), 
+			seen = $t._g(inst,'navNum'), thumbSeen = (seen-1)*space, bgAnimate = $t._g(inst,'tbgAnimate');
+		var $selected = $t._indexAt(inst), selectedPos = $selected.position();
 
-		if(b){
-			h = d=='lr'? h.top : h.left;
-			if (parseInt(h)>f) {
-				if(g){
-					var i = d=='lr'? parseInt($s.css('top')):parseInt($s.css('left'));
-					i>f? d=='lr'?$s.css('top',0):$s.css('left',0):'';
+		if(loop){
+			selectedPos = position=='lr'? selectedPos.top : selectedPos.left;
+			if (parseInt(selectedPos)>thumbSeen) {
+				if(bgAnimate){
+					var scrollPos = position=='lr'? parseInt($scroll.css('top')):parseInt($scroll.css('left'));
+					scrollPos>thumbSeen? position=='lr'?$scroll.css('top',0):$scroll.css('left',0):'';
 				}
-				$t._thumbSelected(null,a);
+				$t._curSelected(null,inst);
 			}
 		}
 		else{
-			var $list = a.$itemList, listPos = d=='lr'? $list.css('top') : $list.css('left');
-			h = d=='lr'? h.top : h.left;
-			listPos = Math.abs(parseInt(listPos)), selecttedPos = Math.abs(parseInt(h));
+			var $list = inst.$itemList, listPos = position=='lr'? $list.css('top') : $list.css('left');
+			selectedPos = position=='lr'? selectedPos.top : selectedPos.left;
+			listPos = Math.abs(parseInt(listPos)), selecttedPos = Math.abs(parseInt(selectedPos));
 			
-			if (selecttedPos<listPos) a.selected = parseInt(listPos/c);
-			else if((listPos+f) < h) {
-				a.selected = parseInt(listPos/c);
-				if(g){
-					var i = d=='lr'? parseInt($s.css('top')):parseInt($s.css('left'));
-					i>f? d=='lr'?$s.css('top',0):$s.css('left',0):'';
+			if (selecttedPos<listPos) inst.selected = parseInt(listPos/space);
+			else if((listPos+thumbSeen) < selectedPos) {
+				inst.selected = parseInt(listPos/space);
+				if(bgAnimate){
+					var scrollPos = position=='lr'? parseInt($scroll.css('top')):parseInt($scroll.css('left'));
+					scrollPos>thumbSeen? position=='lr'?$scroll.css('top',0):$scroll.css('left',0):'';
 				}
 			}
-			else a.clickSelected = a.selected;
-			if(a.clickSelected!=a.selected) $t._thumbSelected(null,a);
+			else inst.clickSelected = inst.selected;
+			if(inst.clickSelected!=inst.selected) $t._curSelected(null,inst);
 		}
 		
-		$t._startAuto(a);
+		$t._startPlay(inst.id);
 	},
-	_bindItemEvent: function(a){
-		var $t = this, b = $t._g(a,'navNum'), c=$t._g(a,'addtional'), $l= a.$itemList,ev = $t._g(a,'events')
-		$l.delegate('li.',ev,function(e){
-			var $this = $(this),
-            	index = $this.attr('data-index');
-            if (ev==='click') e.preventDefault();
-            if(index!=a.selected){
-            	$t._thumbSelected($this,a);
-            }
-		});
-		if(b=='css' && c){
-			a.$addtional.delegate('li',ev,function(e){
-				var $this = $(this), index = $this.attr('data-index');
-				if (ev==='click') e.preventDefault();
-				if(index!=a.selected){
-					$t._thumbSelected($l.find('li').eq(index),a);
-				}
-			})
-		}
-	},
-	_getTitle: function(t,l,g){
-		var t_;
-		if (typeof t=='string') return t_ = l=='none'? t:('<a href="'+l+'" target="'+g+'">'+t+'<\/a>');
-		else if(typeof t=='object'){
-			var l_ = t.l? t.l:l,
-				g_=t.g? t.g:g;
-			return t_ = l_=='none'? t.t:('<a href="'+l_+'" target="'+g_+'">'+t.t+'<\/a>');
-		}
-		else return '';
-	},
-	_resetSelected: function(a){
-		var $t=this, b=$t._g(a,'tbgAnimate'),d=$t._g(a,'navPlace'),c=$t._g(a,'tbgSpeed'),$s=a.$scroll;
-		$t._scrollNext(a,0,function(){$t._enabledBtnNext(a);$t._disabledBtnPrev(a);});
-		b? (d=='lr'? 
-						  $s.animate({top:0},c)
-						: $s.animate({left:0},c)
-				   ): '';
-	},
-	_thumbSelected: function(o,a){
+
+	_curSelected: function(obj,inst){
 		var $t = this, 
-			b = $t._g(a,'tbgSpeed'),
-			c = a.scrollOver, 
-			d = $t._g(a,'navPlace'), 
-			e = $t._g(a,'tbgAnimate'),
-			f = $t._g(a,'tType'),
-			$l = a.$itemList,
-			g = $t._g(a,'loop'),
-			i;
+			speed = $t._g(inst,'tbgSpeed'),
+			overClass = inst.scrollOver, 
+			position = $t._g(inst,'navPlace'), 
+			bgAnimate = $t._g(inst,'tbgAnimate'),
+			dataIndex = '',
+			tc = $t._g(inst,'tContent'),
+			$list = inst.$itemList,
+			loop = $t._g(inst,'loop');
 		
-		if(!a.firstPlay) a.firstPlay = true;
-		!o? (g? o = $l.find('li').eq(0): o = $l.find('li').eq(a.selected) ): '';
-		i = o.attr('data-index');
-		a.firstPlay? (a.selected = -1,a.firstPlay=false) : '' ;
-		a.selected = a.clickSelected = i;
-		a._selected = o.index();
-		if(f=='image'){
-			var $img = o.find('img'), opacity = $t._g(a,'opacity');
+		if(!inst.firstPlay) inst.firstPlay = true;
+		!obj? (loop? obj = $list.find('li').eq(0): obj = $list.find('li').eq(inst.selected) ): '';
+		dataIndex = obj.attr('data-index');
+		inst.firstPlay? (inst.selected = -1,inst.firstPlay=false) : '' ;
+		inst.selected = inst.clickSelected = dataIndex;
+		inst.selected_ = obj.index();
+		if(tc=='image'){
+			var $img = obj.find('img'), opacity = $t._g(inst,'opacity');
 			typeof $img[0]!='undefined'? $img.stop().animate({'opacity':1},'fast'):'';
-			o.siblings().each(function(){
+			obj.siblings().each(function(){
 				var $this = $(this), thisImg = $this.find('img');
 				typeof(thisImg[0])!='undefined'? thisImg.stop().animate({opacity:opacity},'fast'):'';
 			});
 		}
-		var x, y, z;
+		var objPos, listPos, overPos;
 		
-		d=='lr'? (x=o.position().top,y= $l.css('top'),z= x-Math.abs(parseInt(y)))
-							 : (x=o.position().left,y= $l.css('left'),z= x-Math.abs(parseInt(y)));
+		position=='lr'? (objPos=obj.position().top,listPos= $list.css('top'),overPos= objPos-Math.abs(parseInt(listPos)))
+							 : (objPos=obj.position().left,listPos= $list.css('left'),overPos= objPos-Math.abs(parseInt(listPos)));
 		
-		var u = $t._g(a,'navSpace'), v = $t._g(a,'navNum'), w = u*(v-1);
+		var space = $t._g(inst,'navSpace'), seen = $t._g(inst,'navNum'), thumbSeen = space*(seen-1);
 		var func = function(tag){
-			z > w? $t._scrollNextByStep(a): z<0? $t._resetSelected(a):'';
+			overPos > thumbSeen? $t._scrollNextByStep(inst): overPos<0? $t._resetSelected(inst):'';
 			!tag?$(this).css('z-index',3):'';
 		};
-		$t._display(a);
-
-		if(e){
-			var $s=a.$scroll;
-			d=='lr'? $s.css('z-index',5).stop(true,true).animate({top:z},b,func)
-			 					 : $s.css('z-index',5).stop(true,true).animate({left:z},b,func);
+		$t._display(inst);
+		
+		
+		if(bgAnimate){
+			var space = $t._g(inst,'navSpace'), $scroll=inst.$scroll;
+			position=='lr'? $scroll.css('z-index',5).stop(true,true).animate({top:overPos},speed,func)
+			 					 : $scroll.css('z-index',5).stop(true,true).animate({left:overPos},speed,func);
 		}
 		else{
 			func(true);
 		}
-		o.addClass(c).siblings().removeClass(c);
+		obj.addClass(overClass).siblings().removeClass(overClass);
 	},
-	_setInfo: function(a){
+	_resetSelected: function(inst){
+		var $t=this, bgAnimate=$t._g(inst,'tbgAnimate'),position=$t._g(inst,'navPlace'),bgSpeed=$t._g(inst,'tbgSpeed'),$scroll=inst.$scroll;
+		$t._scrollNext(inst,0,function(){$t._enabledNext(inst);$t._disabledPrev(inst);});
+		bgAnimate? (position=='lr'? 
+						  $scroll.animate({top:0},bgSpeed)
+						: $scroll.animate({left:0},bgSpeed)
+				   ): '';
+	},
+	
+	_setTipsInfo: function(inst){
 		var $t = this;
-		var b = $t._g(a,'showTips');
-		if(b){
-			var //c = a.$tipsBg, 
-				//$tipsInfo = a.$tipsInfo,
-				c = a.selected,
-				d = a.data[c],
-				l = d.l,
-				g=$t._g(a,'target'), 
-				i = $t._g(a,'_ptype'),
-				j = $t._g(a,'ptype');
+		var tips = $t._g(inst,'showTips');
+		if(tips){
+			var $tipsBg = inst.$tipsBg, 
+				$tipsInfo = inst.$tipsInfo,
+				dataIndex = inst.selected,
+				thisInfo = inst.data[dataIndex],
+				_link = thisInfo.l,
+				target=$t._g(inst,'target'), 
+				_ptype = $t._g(inst,'_ptype'),
+				ptype = $t._g(inst,'ptype');
 				
-			if(j){
-				var k = d.tp, c_;
-				c_ = (k ? (i+' '+i+'-'+k) : i) ;
-				a.$playType[0].className = c_;
+			if(ptype){
+				var _type = thisInfo.tp, _class;
+				_class = (_type ? (_ptype+' '+_ptype+'-'+_type) : _ptype) ;
+				inst.$playType[0].className = _class;
 			}
-			
+			var GT= function(T,L,G){
+					var T_;
+					if (typeof T=='string') return T_ = L=='none'? T:('<a href="'+L+'" target="'+G+'">'+T+'<\/a>');
+					else if(typeof T=='object'){
+						var L_ = T.l? T.l:L, G_=T.g? T.g:G;
+						return T_ = L_=='none'? T.t:('<a href="'+L_+'" target="'+G_+'">'+T.t+'<\/a>');
+					}
+					else return '';
+				},
+				GL = function(E,L,T){
+					if(E&& !isArray(E)) return GT(E,L,T);
+						var l_ = E.length, e_='';
+						for(var i=0; i<l_; i++){e_ +=GT(E[i],L,T);}
+						return e_;				
+				};
+				GOT= function(I,L,T){
+					var c_ = $t._g(inst,'_otitle');
+					if (typeof I=='string') return '<p class="'+c_+'">'+I+'<\/p>';
+					if (typeof I=='object'){
+						if(I&&!isArray(I)) 
+							return '<p class="'+c_+'"><label class="name">'+GT(I.n,'none')+': <\/label>'+GL(I.list,L,T)+'<\/p>';
+						var L_ = I.length,O=[],I_;
+						for(var i=0; i<L_; i++){
+							I_ = I[i];
+							O.push('<p class="'+c_+'">');
+							O.push('<label class="name">'+GT(I_.n,'none')+': <\/label>');
+							O.push(GL(I_.list, L, T))
+							O.push('<\/p>');
+						}
+						return O.join("");
+					}
+				};
+			var GTB = function(B,L,G,C){
+				var R = '<a class="'+C+'" href="'+L+'" target="'+G+'"></a>';
+				if (typeof B=='string') R = '<a class="'+C+' '+C+'-'+B+'" href="'+L+'" target="'+G+'"></a>';
+				else if (typeof B=='object'){
+					var L_,G_,C_,T_,D_,E_='';
+					var OB = function(Z,i){
+						if(!isEmptyObject(Z)){
+							L_ = Z.l? Z.l:L,
+							G_= Z.g? Z.g:G,
+							C_= Z.c? C+'-'+Z.c:C,
+							D_= Z.t? Z.t:'',
+							T_ = Z.t_? Z.t_:'';
+							return i&i>0 ? '<a class="'+C+' '+C+i+' '+C_+'" href="'+L_+'" target="'+G_+'" title="'+D_+'">'+T_+'</a>'
+									 	 : '<a class="'+C+' '+C_+'" href="'+L_+'" target="'+G_+'" title="'+D_+'">'+T_+'</a>'
+						}
+						else return R;
+					};
+					if(isArray(B)){
+						D=B.length;
+						for(var i=0; i<D; i++) E_ +=OB(B[i],i);
+						R = E_;
+					}
+					else{
+						R = OB(B);
+					}
+				}
+				return R;
+			};
 			var info = '',
-				h2_ = $t._getTitle(d.t,l,g),
-				h3_ = $t._getTitle(d.t1,l,g),
+				h2_ = GT(thisInfo.t,_link,target),
+				h3_ = GT(thisInfo.t1,_link,target),
 				hr_='';
 			h2_= h2_!='' ? '<h2>'+h2_+'<\/h2>':'' ;
 			h3_= h3_!='' ? '<h3>'+h3_+'<\/h3>':'' ;
 			if(h2_!='' || h3_!='') hr_='<hr class="separator" />';
 			info += h2_+h3_+hr_;
-			var ot = d.ot;
-			ot= $t._getOtherTitle(ot,l,g,a);
+			var ot = thisInfo.ot;
+			ot= GOT(ot,_link,target,inst);
 			ot= typeof ot !='undefined'? ot:'';
-			var m = d.m? '<p class="info">'+d.m+'<\/p>':'';
-			info += ot+m;
-			if ($t._g(a,'tipsBtn')){
-				var n = $t._g(a,'_tbtn'), n_ = $t._getTipsBtn(d.b_, l, g, n);
-				info +=n_;
+			var msg = thisInfo.m? '<p class="info">'+thisInfo.m+'<\/p>':'';
+			info += ot+msg;
+			if ($t._g(inst,'tipsBtn')){
+				var _btn = $t._g(inst,'_tbtn');
+				var _tbtn = GTB(thisInfo.b_, _link,target, _btn);
+				info +=_tbtn;
 			}
-			$t._tipsAnimate(a,info);
+			$t._tipsAnimate(inst,info);
 		}
 	},
-	_getTipsBtn: function(b,l,g,c){
-		if (typeof b=='string') return '<a class="'+c+' '+c+'-'+b+'" href="'+l+'" target="'+g+'"></a>';
-		else if (typeof b=='object'){
-			var l_,g_,c_,t_;
-			if(!isEmptyObject(b)){
-				l_ = b.l? b.l:l,
-				g_= b.t? b.t:g,
-				c_= b.c? c+'-'+b.c:c,
-				t_ = b.t_? b.t_:'';
-				return '<a class="'+c+' '+c_+'" href="'+l_+'" target="'+g_+'">'+t_+'</a>';
-			}
-		}
-		else return '<a class="'+c+'" href="'+l+'" target="'+g+'"></a>';;
-	},
-	_tipsAnimate: function(a,i){
-		var b = a.$tipsInfo,c = a.$tipsBg, d =this._g(a,'tipsAnimate');
-		var e = b.find('div');
-		switch (d){
+	
+	_tipsAnimate: function(inst,info){
+		var $tipsInfo = inst.$tipsInfo,$tipsBg = inst.$tipsBg, tipsAnimate =this._g(inst,'tipsAnimate');
+		var _$info = $tipsInfo.find('div').not('.tips-corner');
+		switch (tipsAnimate){
 			case 'slide':{
-				i!=''?(  e.html('').html(i),
-							b.stop(false,true).slideUp('normal').stop(false,true).slideDown('normal'),
-							c.stop(false,true).slideUp('normal').stop(false,true).slideDown('normal')
+				info!=''?(  _$info.html('').html(info),
+							$tipsInfo.stop(false,true).slideUp('normal').stop(false,true).slideDown('normal'),
+							$tipsBg.stop(false,true).slideUp('normal').stop(false,true).slideDown('normal')
 						)
 						:(	
-							e.html(''), b.stop(false,true).slideUp('fast'), c.stop(false,true).slideUp('fast') 
+							_$info.html(''), $tipsInfo.stop(false,true).slideUp('fast'), $tipsBg.stop(false,true).slideUp('fast') 
 						);
 				break;
 			}
 			case 'fade':{
-				i!=''?(
-							e.html('').html(i),
-							b.stop(false,true).fadeOut('normal').stop(false,true).fadeIn('normal'),
-							c.stop(false,true).fadeOut('normal').stop(false,true).fadeIn('normal')
+				info!=''?(
+							_$info.html('').html(info),
+							$tipsInfo.stop(false,true).fadeOut('normal').stop(false,true).fadeIn('normal'),
+							$tipsBg.stop(false,true).fadeOut('normal').stop(false,true).fadeIn('normal')
 						)
 						:(
-							e.html(''),b.stop(false,true).fadeOut('fast'),c.stop(false,true).fadeOut('fast')
+							_$info.html(''),$tipsInfo.stop(false,true).fadeOut('fast'),$tipsBg.stop(false,true).fadeOut('fast')
 						);
 				break;
 			}
 			default:{
-				i!=''?(e.html('').html(i),b.show(),c.show()):(e.html(''),b.hide(),c.hide());
+				info!=''?(_$info.html('').html(info),$tipsInfo.show(),$tipsBg.show()):(_$info.html(''),$tipsInfo.hide(),$tipsBg.hide());
 			}
-		}	
-	},
-	_getOtherTitle: function(info,link,target,a){
-		var $t = this, _class = $t._g(a,'_otitle');
-		if (typeof info=='string') return '<p class="'+_class+'">'+info+'<\/p>';
-		if (typeof info=='object'){
-			var getlist = function(list){
-				if(list&& !isArray(list)) return $t._getTitle(list,link,target);
-				var _Length = list.length, _list='';
-				for(var i=0; i<_Length; i++){
-					_list +=$t._getTitle(list[i],link,target);
-				}
-				return _list;				
-			};
-			
-			if(info&&!isArray(info)) 
-				return '<p class="'+_class+'"><label class="name">'+$t._getTitle(info.n,'none')+': <\/label>'+getlist(info.list)+'<\/p>';
-			var length = info.length,ot=[],_info;
-			for(var i=0;i<length;i++){
-				_info = info[i];
-				ot.push('<p class="'+_class+'">');
-				ot.push('<label class="name">'+$t._getTitle(_info.n,'none')+': <\/label>');
-				ot.push(getlist(_info.list))
-				ot.push('<\/p>');
-			}
-			return ot.join("");
 		}
+		
 	},
-	_setCallback: function(a){
-		var d = a.data, s = a.selected;
-		var r = {
-			id: a.id,
-			selected:s,
-			total:a.total,
-			curData: d[s]? d[s] : ''//image:_images[_selected]
-		}
-		a.callDone = r;
-	},
-	_display: function(a,callback){
+	
+	_display: function(inst){
 		var $t = this;
-		$t._stop(a);
-		var player = $t._g(a,'player');
-		var callback = $t._g(a,'callback');
-		callback? $t._setCallback(a):'';
-		a.preLoad = true;
+		var id = inst.id;
+		$t._stop(id);
+		var player = $t._g(inst,'player');
+		var callback = $t._g(inst,'callback');
+		var setCallback = function(){
+			var data_ = inst.data, selected_ = inst.selected;
+			var returnCall = {
+				id: inst.id,
+				total:inst.total,
+				selected:inst.selected,
+				curNav: $t._indexAt(inst),
+				curPlayer: inst.$currentli,
+				curData: data_[selected_]? data_[selected_] : ''//image:_images[selected_]
+			}
+			inst.callDone = returnCall;
+		};
+		callback? setCallback(inst):'';
+		inst.preLoad = true;
 		if(!player){
-			callback? callback(a.callDone):''
-			a.preLoad = false;
-			if (!a.hoverPause) $t._startAuto(a);
+			callback? callback(inst.callDone):''
+			inst.preLoad = false;
+			if (!inst.hoverPause) $t._startPlay(id);
 		}
 		else{
-			var _animate = $t._g(a,'animate'),$l=a.$itemList,total = a.total,
-				$player=a.$player,$images = a.images;
+			var _animate = $t._g(inst,'animate'),$list=inst.$itemList,total = inst.total,
+				$player=inst.$player,$images = inst.images;
 				getList = function(index){
 					return $images[index];
 				},
@@ -724,65 +733,76 @@ $.extend(ImageShown.prototype, {
 						curSrc===$t._blankImg ? $img[0].src=$img.attr('data-origital'):
 											(curSrc!=origital ? $img[0].src=origital:'');
 					}
-					
 				},
-				dataIndex = a.selected,
+				dataIndex = inst.selected,
 				//var $li;
-				a.$currentli = getList(dataIndex);
+			inst.$currentli = getList(dataIndex);
+			var _$curli = inst.$currentli, _$played = inst.played;
+			$t._g(inst,'preload')?loadListImg(_$curli):'';
+			var speed = $t._g(inst,'pSpeed');
+			var pwidth = $t._g(inst,'pWidth'), pheight = $t._g(inst,'pHeight');
 			
-			loadListImg(a.$currentli);
-			var speed = $t._g(a,'pSpeed');
-			var pwidth = $t._g(a,'pWidth'), pheight = $t._g(a,'pHeight');
-			var completeIndex = a.$currentli.index();
-			var $currentImg = a.$currentli.find('img');
-			
-
 			var doPlayerAnimate = function(){
-				var _$curli = a.$currentli, _$played = a.played;
 				switch (_animate){
 					case 'fade':
-						$t._playWithFade(_$curli,speed,total,function(){a.played = _$curli;});
+						$t._pf(_$curli,speed,total,function(){inst.played = _$curli;});
 						break;
 					case 'left':
-						$t._playLeftRight(_$curli,pwidth,total,speed,function(){a.played=_$curli;_$curli.siblings().css('left',pwidth);},'left');
+						$t._plr(_$curli,pwidth,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('left',pwidth);},'left');
 						break;
 					case 'right':
-						$t._playLeftRight(_$curli,pwidth,total,speed,function(){a.played=_$curli;_$curli.siblings().css('left',0-pwidth);});
+						$t._plr(_$curli,pwidth,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('left',0-pwidth);});
 						break;
 					case 'bottom':
-						$t._playDwonUp(_$curli,pheight,total,speed,function(){a.played=_$curli;_$curli.siblings().css('top',pheight);},'bottom');
+						$t._pbt(_$curli,pheight,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('top',pheight);},'bottom');
 						break;
 					case 'top':
-						$t._playDwonUp($curli,pheight,total,speed,function(){a.played=_$curli;_$curli.siblings().css('top',0-pheight);});
+						$t._pbt($curli,pheight,total,speed,function(){inst.played=_$curli;_$curli.siblings().css('top',0-pheight);});
 						break;
 					default : _$curli.stop().css('opacity',1).show().siblings().css('opacity',0).hide();
 				}
-				if (!a.hoverPause) $t._startAuto(a);
-				$t._setInfo(a);
+				if (!inst.hoverPause) $t._startPlay(id);
+				$t._setTipsInfo(inst);
 			};
-			$l.each(function(){
+			$list.each(function(){
 				$(this).find('img').unbind();
 			});
 			
-			if(a.completeImg[completeIndex]){
-				a.preLoad = false;
+			var complete = _$curli.index();
+			var $currentImg = _$curli.find('img');
+			
+			if(inst.completeImg[complete]){
+				inst.preLoad = false;
 				doPlayerAnimate();
-				callback? callback(a.callDone):'';
+				callback? callback(inst.callDone):'';
 			}
 			else{
-				var _$played = a.played;
+				var _$played = inst.played;
 				if(_$played) _$played.css('opacity','0.3');
-				$currentImg.load(function(){
-					a.preLoad = false;
+				var loadFunc = function(){
+					inst.preLoad = false;
 					doPlayerAnimate();
-					callback? callback(a.callDone):'';
-				});
-				a.completeImg.push($(this));
+					callback? callback(inst.callDone):'';
+				}
+				if($currentImg[0]){
+					$currentImg.load(function(){
+						$(this).closest('li').attr('data-missing','false')
+						loadFunc();
+					}).error(function(){
+						$(this).closest('li').attr('data-missing','true')
+						inst.$currentli.html('<p class="'+$t._g(inst,'_missing')+'">'+$t._g(inst,'missing')+'</p>')
+						loadFunc();
+					});
+				}
+				else{
+					loadFunc();
+				}
+				inst.completeImg[complete]=$currentImg;
 			}
 
 		}
 	},
-	_playLeftRight:function(obj,width,total,speed,fun,where){
+	_plr:function(obj,width,total,speed,fun,where){
 		var w_ = width, t_ = total ,s_ = speed, l, l_;
 		var f_ = fun||function(){};
 		where=='left'?(l=w_, l_=0-w_): (l=0-w_, l_=w_);
@@ -799,7 +819,7 @@ $.extend(ImageShown.prototype, {
 		if(obj.css('opacity')&& obj.css('opacity')<1) obj.css('opacity',1)
 		obj.stop(true,true).css({'z-index': t_ + 1,'left':l}).animate({'left':0},speed,f_);
 	},
-	_playDwonUp:function(obj,height,total,speed,fun,where){
+	_pbt:function(obj,height,total,speed,fun,where){
 		var h_ = height, t_ = total ,s_ = speed, top, top_;
 		var f_ = fun||function(){};
 		where=='bottom'?(top=h_,top_=0-h_): (top=0-h_,top_=h_);
@@ -816,308 +836,307 @@ $.extend(ImageShown.prototype, {
 		if(obj.css('opacity')&& obj.css('opacity')<1) obj.css('opacity',1)
 		obj.stop(true,true).css({'z-index': t_ + 1,'top':top}).animate({'top':0},speed,f_);
 	},
-	_playWithFade: function(obj,speed,total,fun){
+	_pf: function(obj,speed,total,fun){
 		var func = fun || function(){};
 		obj.siblings().each(function(index){$(this).css({'z-index':total-index});});
 		obj.siblings().stop().animate({'opacity':0},speed);
 		obj.css('z-index',total+1).stop().animate({'opacity':1},speed,func);
 	},
-	_indexAt: function(a){
-		var b = a.selected;
-        var $l = a.$itemList.find("li"),
-        	i, j, $f = null, $s;
-        for (i = 0, j = $l.length; i < j; i++) {
-            $s = $($l[i]);
-            if ($s.attr('data-index') === b) {
-                $f = $s;
+	_indexAt: function(inst){
+		var selected = inst.selected;
+        var $list = inst.$itemList.find("li"),
+        	i, j, $find = null, $selected;
+        for (i = 0, j = $list.length; i < j; i++) {
+            $selected = $($list[i]);
+            if ($selected.attr('data-index') === selected) {
+                $find = $selected;
                 break;
             }
         }
-        return $f;
+        return $find;
 	},
-	_btnsPrevClick: function(a){
-		if(!a.$btnPrev||a.$btnPrev=='') return;
+	_preClick: function(inst){
+		if(!inst.$btnPrev||inst.$btnPrev=='') return;
 		var $t = this;
-		var b = $t._g(a,'navSpace'),
-			c = $t._g(a,'step'),
-			d = a.total,
-			e = $t._g(a,'scrollSpeed'),
-			f = $t._g(a,'navPlace'),
-			g = $t._g(a,'tbgAnimate'),
-			h = $t._g(a,'loop'),
-			i,$st,$sc,
-			$l = a.$itemList;
-		a.$btnPrev.bind('click',function(){
-			if(h){
-				if ( a.btnClick){
-					a.btnClick = false;
-					if(f=='lr'){
-						if(g){
-							$sc = a.$scroll;
-							$st = $t._indexAt(a);
-							i = parseInt($sc.css('top'));
-							i >= (d-c)*b ? $sc.css({top:$st.css('top')}):'';
+		var space = $t._g(inst,'navSpace'),
+			step = $t._g(inst,'step'),
+			total = inst.total,
+			speed = $t._g(inst,'scrollSpeed'),
+			position = $t._g(inst,'navPlace'),
+			bgAnimate = $t._g(inst,'tbgAnimate'),
+			loop = $t._g(inst,'loop'),
+			$selected,$scroll,
+			$list = inst.$itemList;
+		inst.$btnPrev.bind('click',function(){
+			if(loop){
+				if ( inst.btnClick){
+					inst.btnClick = false;
+					if(position=='lr'){
+						if(bgAnimate){
+							$scroll = inst.$scroll;
+							$selected = $t._indexAt(inst);
+							scrollPos = parseInt($scroll.css('top'));
+							scrollPos >= (total-step)*space ? $scroll.css({top:$selected.css('top')}):'';
 						}
-						$l.find('li:gt('+(d-c-1)+')').insertBefore($l.find('li:first')).each(
+						$list.find('li:gt('+(total-step-1)+')').insertBefore($list.find('li:first')).each(
 							function(index){
 			                	var $ts = $(this),thisPos = parseInt($ts.css('top'));
-			                    $ts.css({top: thisPos - d * b})
+			                    $ts.css({top: thisPos - total * space})
 			            	}
 						);
-						$l.find('li').each(function(index){
+						$list.find('li').each(function(index){
 							var $ts = $(this);
 							$ts.stop(true,true)
-							   .animate({top:parseInt($ts.css('top'))+c*b},
-							   			e,
+							   .animate({top:parseInt($ts.css('top'))+step*space},
+							   			speed,
 										function(){
-											if(index === d - c) a.btnClick = true;
+											if(index === total - step) inst.btnClick = true;
 								});
 						});
-						if(g){
-							var k = $t._g(a,'tbgSpeed')
-							$sc.stop(true,true)
-								   .animate({top: parseInt($st.css('top')) + (b*c)},
-								   			k,
+						if(bgAnimate){
+							var tbgSpeed = $t._g(inst,'tbgSpeed')
+							$scroll.stop(true,true)
+								   .animate({top: parseInt($selected.css('top')) + (space*step)},
+								   			tbgSpeed,
 	                    					function(){ 
-	                    						if(parseInt($sc.css('top'))=== (d-1)*b)
-	                    							$sc.css({top:(b*c)-parseInt($st.css("top"))});
+	                    						if(parseInt($scroll.css('top'))=== (total-1)*space)
+	                    							$scroll.css({top:(space*step)-parseInt($selected.css("top"))});
 	                    					});
 						}
 						
 					}
 					else{
-						if(g){
-							$sc = a.$scroll;
-							$st = $t._indexAt(a);
-							i = parseInt($sc.css('left'));
-							i >= (d-c)*b ? $sc.css({left:$st.css('left')}):'';
+						if(bgAnimate){
+							$scroll = inst.$scroll;
+							$selected = $t._indexAt(inst);
+							scrollPos = parseInt($scroll.css('left'));
+							scrollPos >= (total-step)*space ? $scroll.css({left:$selected.css('left')}):'';
 						}
-						$l.find('li:gt('+(d-c-1)+')').insertBefore($l.find('li:first')).each(
+						$list.find('li:gt('+(total-step-1)+')').insertBefore($list.find('li:first')).each(
 							function(index){
 			                	var $ts = $(this),thisPos = parseInt($ts.css('left'));
-			                    $ts.css({left: thisPos - d * b})
+			                    $ts.css({left: thisPos - total * space})
 			            	}
 						);
-						$l.find('li').each(function(index){
+						$list.find('li').each(function(index){
 							var $ts = $(this);
 							$ts.stop(true,true)
-							   .animate({left:parseInt($ts.css('left'))+c*b},
-							   			e,
+							   .animate({left:parseInt($ts.css('left'))+step*space},
+							   			speed,
 										function(){
-											if(index === d - c) a.btnClick = true;
+											if(index === total - step) inst.btnClick = true;
 								});
 						});
-						if(g){
-							var k = $t._g(a,'tbgSpeed')
-							$sc.stop(true,true)
-								   .animate({left: parseInt($st.css('left')) + (b*c)},
-								   			k,
+						if(bgAnimate){
+							var tbgSpeed = $t._g(inst,'tbgSpeed')
+							$scroll.stop(true,true)
+								   .animate({left: parseInt($selected.css('left')) + (space*step)},
+								   			tbgSpeed,
 	                    					function(){ 
-	                    						if(parseInt($sc.css('left'))=== (d-1)*b)
-	                    							$sc.css({left:(b*c)-parseInt($st.css('left'))});
+	                    						if(parseInt($scroll.css('left'))=== (total-1)*space)
+	                    							$scroll.css({left:(space*step)-parseInt($selected.css('left'))});
 	                    					});
 						}
 					}
 				}
 			}
 			else{//!loop
-				if ( a.btnClick){
-					$t._scrollPrevByStep(a)
+				if ( inst.btnClick){
+					$t._scrollPrevByStep(inst)
 				}
 			}
 		});
 	},
-	_btnsNextClick: function(a){
-		if(!a.$btnNext||a.$btnNext=='') return;
+	_nextClick: function(inst){
+		if(!inst.$btnNext||inst.$btnNext=='') return;
 		var $t = this;
-		a.$btnNext.bind('click',function(){
-			if (a.btnClick) $t._scrollNextByStep(a,true);
+		inst.$btnNext.bind('click',function(){
+			if (inst.btnClick) $t._scrollNextByStep(inst,true);
 		});
 	},
-	_scrollPrevByStep: function(a){
+	_scrollPrevByStep: function(inst){
 		var $t = this,
-			//b=a.total,
-			//b=$t._g(a,'navNum'),
-			b = $t._g(a,'navSpace'),
-			c = $t._g(a,'step'),
-			$l = a.$itemList,
-			d = $t._g(a,'navPlace'),
-			e = $t._g(a,'loop'),
-			f = $t._g(a,'tbgAnimate');
-		if(!e){
-			$t._enabledBtnNext(a);
-			var g = d=='lr'? parseInt($l.css('top')): parseInt($l.css('left')),
-				h = b*c;
-				if(g===0) return;
-				a.btnClick = false;
-				var l=0, i = d=='lr'? parseInt($l.css('top')) + b*c : parseInt($l.css('left')) + b*c;
-				//console.log(i);
-				i>0? (l=i,i = 0 ): '';
-			$t._scrollPrev( a,
-						i,
+			total=inst.total,
+			seen=$t._g(inst,'navNum'),
+			space = $t._g(inst,'navSpace'),
+			step = $t._g(inst,'step'),
+			$list = inst.$itemList,
+			position = $t._g(inst,'navPlace'),
+			loop = $t._g(inst,'loop'),
+			bgAnimate = $t._g(inst,'tbgAnimate');
+		if(!loop){
+			$t._enabledNext(inst);
+			var listPos = position=='lr'? parseInt($list.css('top')): parseInt($list.css('left')),
+				stepPos = space*step;
+				if(listPos===0) return;
+				inst.btnClick = false;
+				var over=0, listScroll = position=='lr'? parseInt($list.css('top')) + space*step : parseInt($list.css('left')) + space*step;
+				//console.log(listScroll);
+				listScroll>0? (over=listScroll,listScroll = 0 ): '';
+			$t._scrollPrev( inst,
+						listScroll,
 						function(){
-							d=='lr'? (Math.abs(parseInt($l.css('top')))===0? $t._disabledBtnPrev(a):'')
-												 : (Math.abs(parseInt($l.css('left')))===0? $t._disabledBtnPrev(a):'');
-							a.btnClick = true;
+							position=='lr'? (Math.abs(parseInt($list.css('top')))===0? $t._disabledPrev(inst):'')
+												 : (Math.abs(parseInt($list.css('left')))===0? $t._disabledPrev(inst):'');
+							inst.btnClick = true;
 						}
 		        	 );
-			if(f){
-				var $s=a.$scroll, j=$t._g(a,'tbgSpeed'),
-					k = d=='lr'? parseInt($s.css('top'))+h : parseInt($s.css('left'))+h;
-				d=='lr'? $s.animate({top:k-l},j): $s.animate({left:k-l},j);
+			if(bgAnimate){
+				var $scroll=inst.$scroll, bgSpeed=$t._g(inst,'tbgSpeed'),
+					bgPos = position=='lr'? parseInt($scroll.css('top'))+stepPos : parseInt($scroll.css('left'))+stepPos;
+				position=='lr'? $scroll.animate({top:bgPos-over},bgSpeed): $scroll.animate({left:bgPos-over},bgSpeed);
 			}
 		}
 	},
-	_scrollNextByStep: function(a,b){
+	_scrollNextByStep: function(inst,btnClick){
 		var $t = this,
-			c=a.total,
-			d=$t._g(a,'navNum'),
-			e = $t._g(a,'navSpace'),
-			f = $t._g(a,'step'),
-			$l = a.$itemList,
-			g = $t._g(a,'navPlace'),
-			h = $t._g(a,'loop'),
-			i = $t._g(a,'tbgAnimate'),
-			$s = a.$scroll,
-			j = $t._g(a,'tbgSpeed'),
-			k = $t._g(a,'scrollSpeed');
-		if(!h){
-			$t._enabledBtnPrev(a);
-			var l = g=='lr'? parseInt($l.css('top')): parseInt($l.css('left')),
-				m = (c-d)*e, n = e*f, o;
-			if(Math.abs(l)===m) return;
-			a.btnClick = false;
-			o =l - n,p = 0;
-			Math.abs(o)>m? (p=Math.abs(o)-m,o=0-m): '';
-			$t._scrollNext( a,
-							o,
+			total=inst.total,
+			seen=$t._g(inst,'navNum'),
+			space = $t._g(inst,'navSpace'),
+			step = $t._g(inst,'step'),
+			$list = inst.$itemList,
+			position = $t._g(inst,'navPlace'),
+			loop = $t._g(inst,'loop'),
+			bgAnimate = $t._g(inst,'tbgAnimate'),
+			$scroll = inst.$scroll,
+			bgSpeed=$t._g(inst,'tbgSpeed'),
+			speed = $t._g(inst,'scrollSpeed');
+		if(!loop){
+			$t._enabledPrev(inst);
+			var listPos = position=='lr'? parseInt($list.css('top')): parseInt($list.css('left')),
+				overPos = (total-seen)*space, stepPos = space*step, listScroll;
+			if(Math.abs(listPos)===overPos) return;
+			inst.btnClick = false;
+			listScroll =listPos - stepPos,over = 0;
+			Math.abs(listScroll)>overPos? (over=Math.abs(listScroll)-overPos,listScroll=0-overPos): '';
+			$t._scrollNext( inst,
+							listScroll,
 							function(){
-								g=='lr'? (Math.abs(parseInt($l.css('top')))===(c - d) * e? $t._disabledBtnNext(a):'')
-													 : (Math.abs(parseInt($l.css('left')))===(c - d) * e? $t._disabledBtnNext(a):'');
-								a.btnClick = true;
+								position=='lr'? (Math.abs(parseInt($list.css('top')))===(total - seen) * space? $t._disabledNext(inst):'')
+													 : (Math.abs(parseInt($list.css('left')))===(total - seen) * space? $t._disabledNext(inst):'');
+								inst.btnClick = true;
 							}
 			        	 );
-			if(i){
-				var q = g=='lr'? parseInt($s.css('top'))-n : parseInt($s.css('left'))-n;
-				g=='lr'? $s.animate({top:q+p},j): $s.animate({left:q+p},j);
+			if(bgAnimate){
+				var bgPos = position=='lr'? parseInt($scroll.css('top'))-stepPos : parseInt($scroll.css('left'))-stepPos;
+				position=='lr'? $scroll.animate({top:bgPos+over},bgSpeed): $scroll.animate({left:bgPos+over},bgSpeed);
 			} 
 		}
 		else{//loop
-			a.btnClick = false;
-			if(g=='lr'){
-				$l.find('li').each(function(index){
+			inst.btnClick = false;
+			if(position=='lr'){
+				$list.find('li').each(function(index){
 					$(this).stop()
-						   .animate({top: e * (index - f)},k,
+						   .animate({top: space * (index - step)},speed,
 			               		function(){
-			    	       			if(index === c - f){
-			    	       				a.btnClick = true;
-			               				$l.find('li:lt('+(f)+')').insertAfter($l.find('li:last')).each(
+			    	       			if(index === total - step){
+			               				$list.find('li:lt('+(step)+')').insertAfter($list.find('li:last')).each(
 			               					function(index){
 			               						var $this = $(this), thisPos = parseInt($this.css('top'));
-			               						$this.css({top: c * e + thisPos})
+			               						$this.css({top: total * space + thisPos})
 			               				});
-			               				if(!b){
-			               					var $st_ = $t._indexAt(a);
-		          							a._selected = $st_.index();
+			               				if(!btnClick){
+			               					var _$selected = $t._indexAt(inst);
+		          							inst.selected_ = _$selected.index();
 		          						}
 			               			}
 			                });
 		        });
 
-				if(i&&b){
-					var $st  = $t._indexAt(a);
-					$s.stop(true,true)
-						   .animate({top: parseInt($st.css('top')) - (e*f)},
-	                				j,
+				if(bgAnimate&&btnClick){
+					var $selected  = $t._indexAt(inst);
+					$scroll.stop(true,true)
+						   .animate({top: parseInt($selected.css('top')) - (space*step)},
+	                				bgSpeed,
 	                				function(){
-	                					var _top = parseInt($s.css('top'))
-	                    				if(_top<0) $s.css({top:$st.css('top')})
+	                					var _top = parseInt($scroll.css('top'))
+	                    				if(_top<0) $scroll.css({top:$selected.css('top')})
 	                    	})
 				}
 
-		    	if(i&&!b){
-		    		$s.stop().animate({top:(d-f)*e},j)
+		    	if(bgAnimate&&!btnClick){
+		    		$scroll.stop().animate({top:(seen-step)*space},bgSpeed)
 		    	} 
 			}
 			else{
-				$l.find('li').each(function(index){
+				$list.find('li').each(function(index){
 					$(this).stop()
-						   .animate({left: e * (index - f)},k,
+						   .animate({left: space * (index - step)},speed,
 			               		function(){
-			    	       			if(index === c - f){
-			    	       				a.btnClick = true;
-			               				$l.find('li:lt('+(f)+')').insertAfter($l.find('li:last')).each(
+			    	       			if(index === total - step){
+			    	       				inst.btnClick = true;
+			               				$list.find('li:lt('+(step)+')').insertAfter($list.find('li:last')).each(
 			               					function(index){
 			               						var $this = $(this), thisPos = parseInt($this.css('left'));
-			               						$this.css({left: c * e + thisPos})
+			               						$this.css({left: total * space + thisPos})
 			               				});
 			               				
-			               				if(!b){
-			               					var $st_ = $t._indexAt(a);
-		          							a._selected = $st_.index();
+			               				if(!btnClick){
+			               					var _$selected = $t._indexAt(inst);
+		          							inst.selected_ = _$selected.index();
 			               				}			
 			               			}
 	                        });
 		        });
 			
-				if(i&&b){
-					var $st  = $t._indexAt(a);
-					$s.stop(true,true)
-						   .animate({left: parseInt($st.css('left')) - (e*f)},
-	                				j,
+				if(bgAnimate&&btnClick){
+					var $selected  = $t._indexAt(inst);
+					$scroll.stop(true,true)
+						   .animate({left: parseInt($selected.css('left')) - (space*step)},
+	                				bgSpeed,
 	                    			function(){
-	                    				var _left = parseInt($s.css('left'))
-	                    				if(_left<0) $s.css({left:$st.css('left')})
+	                    				var _left = parseInt($scroll.css('left'))
+	                    				if(_left<0) $scroll.css({left:$selected.css('left')})
 	                    			});
 				}
-		    	if(i&&!b){
-		    		//var $s = a.$s;
-		    		$s.stop().animate({left:(d-f)*e},j)
+		    	if(bgAnimate&&!btnClick){
+		    		var $scroll = inst.$scroll;
+		    		$scroll.stop().animate({left:(seen-step)*space},bgSpeed)
 		    	} 
 			}
 		}
 	},
-	_scrollPrev: function(a,distance,fun) {
-		var $list = a.$itemList,
-            loop = this._g(a,'loop'),
-            speed= this._g(a,'scrollSpeed');
-           	position = this._g(a,'navPlace'),
+	_scrollPrev: function(inst,distance,fun) {
+		var $list = inst.$itemList,
+            loop = this._g(inst,'loop'),
+            speed= this._g(inst,'scrollSpeed');
+           	position = this._g(inst,'navPlace'),
             func = fun || function() {};
             if(!loop){
             	position=='lr'? $list.animate({top: distance},speed, func):$list.animate({left: distance},speed, func)
             }
     },
-	_scrollNext: function(a,distance,fun) {
-		var $list = a.$itemList,
-            loop = this._g(a,'loop'),
-            speed= this._g(a,'scrollSpeed');
-           	position = this._g(a,'navPlace'),
+	_scrollNext: function(inst,distance,fun) {
+		var $list = inst.$itemList,
+            loop = this._g(inst,'loop'),
+            speed= this._g(inst,'scrollSpeed');
+           	position = this._g(inst,'navPlace'),
             func = fun || function() {};
             if(!loop){
             	position=='lr'? $list.animate({top: distance},speed, func):$list.animate({left: distance},speed, func)
             }
     },
-   	_enabledBtnPrev: function(a){
-		var _active = this._g(a,'_active');
-		if(!a.$btnPrev.hasClass(_active)) a.$btnPrev.addClass(_active);
+   	_enabledPrev: function(inst){
+		var _active = this._g(inst,'_active');
+		if(!inst.$btnPrev.hasClass(_active)) inst.$btnPrev.addClass(_active);
 	},
-	_enabledBtnNext: function(a){
-		var _active = this._g(a,'_active');
-		if(!a.$btnNext.hasClass(_active)) a.$btnNext.addClass(_active);
+	_enabledNext: function(inst){
+		var _active = this._g(inst,'_active');
+		if(!inst.$btnNext.hasClass(_active)) inst.$btnNext.addClass(_active);
 	},
-	_disabledBtnPrev: function(a){
-		var _active = this._g(a,'_active');
-		var _hover = this._g(a,'_hover');
-		var _prev = a.$btnPrev;
+	_disabledPrev: function(inst){
+		var _active = this._g(inst,'_active');
+		var _hover = this._g(inst,'_hover');
+		var _prev = inst.$btnPrev;
 		if(_prev.hasClass(_active)){
 			_prev.removeClass(_active);
 			if(_prev.hasClass(_hover)) _prev.removeClass(_hover);
 		} 
 	},
-	_disabledBtnNext: function(a){
-		var _active = this._g(a,'_active');
-		var _hover = this._g(a,'_hover');
-		var _next = a.$btnNext;
+	_disabledNext: function(inst){
+		var _active = this._g(inst,'_active');
+		var _hover = this._g(inst,'_hover');
+		var _next = inst.$btnNext;
 		if(_next.hasClass(_active)){
 			_next.removeClass(_active);
 			if(_next.hasClass(_hover)) _next.removeClass(_hover);
@@ -1128,15 +1147,42 @@ $.extend(ImageShown.prototype, {
 		var id = elem[0].id.replace(/([^A-Za-z0-9_-])/g, '\\\\$1'); // escape jQuery meta chars
 		return {id: id, 
 			$elem: elem,
-			$nav: '', $btnPrev: '',	$btnNext: '',	$scroll: '', $navList: '', $itemList: '',	$player: '', hoverPause:false,preLoad:true,
-			selected:0,_selected:0,timeOutID:null,$currentli:null,clickSelected:0, $tipsBg: '', $tipsInfo: '', $deepNav: '', completeImg:[],
-			scrollOver: null, data:null, images:[], total:0,btnClick:true,callDone:null,played:null,$tipsType:null,firstPlay:null,$playType:''
+			$nav: '', 
+			$btnPrev: '',	
+			$btnNext: '',	
+			$scroll: '', 
+			$navList: '', 
+			$itemList: '',	
+			$player: '', 
+			hoverPause:false,
+			preLoad:true,
+			selected:0,
+			selected_:0,
+			timeOutID:null,
+			$currentli:null,
+			clickSelected:0, 
+			$tipsBg: '', 
+			$tipsInfo: '', 
+			$deepNav: '', 
+			completeImg:[],
+			scrollOver: null, 
+			data:null, 
+			images:[], 
+			total:0,
+			btnClick:true,
+			callDone:null,
+			played:null,
+			$tipsType:null,
+			firstPlay:null,
+			$playType:'',
+			build:false
+//			curMissing:false
 		};
 	},
 
-	_g: function(a, name) {
-		return a.settings[name] !== undefined ?
-			a.settings[name] : this._defaults[name];
+	_g: function(inst, name) {
+		return inst.settings[name] !== undefined ?
+			inst.settings[name] : this._defaults[name];
 	},
 
 	_getInst: function(target) {
@@ -1148,22 +1194,31 @@ $.extend(ImageShown.prototype, {
 		}
 	},
 	_optionImageShown: function(target, name, value) {
-		var a = this._getInst(target);
+		var inst = this._getInst(target);
 		if (arguments.length == 2 && typeof name == 'string') {
 			return (name == 'defaults' ? $.extend({}, $.imageShownT._defaults) :
-				(a ? (name == 'all' ? $.extend({}, a.settings) :
-				this._g(a, name)) : null));
+				(inst ? (name == 'all' ? $.extend({}, inst.settings) :
+				this._g(inst, name)) : null));
 		}
 		var settings = name || {};
 		if (typeof name == 'string') {
 			settings = {};
 			settings[name] = value;
 		}
-		if (a) {
-			extendRemove(a.settings, settings);
-			this._updateImageShown(a);
+		if (inst) {
+			extendRemove(inst.settings, settings);
+			//console.log(inst.build);
+			//if(!inst.build) this._updateImageShown(inst)
+			inst.build? inst.build = false:	this._updateImageShown(inst);
+			//this._updateImageShown(inst)
 		}
-		a = null;
+		inst = null;
+	},
+	_extendRemove:function(target, props) {
+		extendRemove(target, props);
+	},
+	_isEmptyObject:function(obj){
+		return isEmptyObject(obj);
 	}
 });
 
