@@ -29,7 +29,7 @@
 				</ul>
 				<ul>
 					<li class="img-player-item">
-						<p class="this-content"><a href="http://www.google.com" target="_blank"><img src="http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-21/1300702369312-1212.jpg"></a></p>
+						<p class="this-content"><a href="http://www.google.com" target="_blank"><img src="http://news.newone.com.cn/public/cms/public/upload/ad/2011-03-21/1300702369312.jpg"></a></p>
 						<label>
 							<h2>h2标题</h2>
 							<h3>h3标题</h3>
@@ -41,13 +41,13 @@
 							</p>
 							<p class="other-titles">
 								<span class="name">导演</span>
-								<a href="http://google.com">朱宜栋</a>
+								<a href="http://google.com">导演名称</a>
 							</p>
 							<p class="other-titles">
 								<span class="name">主演</span>
-								<a href="http://google.com">朱宜栋</a>
-								<a href="http://google.com">Ethan</a>
-								<a href="http://google.com">Sharon</a>
+								<a href="http://google.com">演员1</a>
+								<a href="http://google.com">演员2</a>
+								<a href="http://google.com">演员3</a>
 							</p>
 							<p class="play-type">comic</p>
 							<p class="tip-btns">
@@ -59,8 +59,8 @@
 			</div>
 			<div id="lvyou" class="images-shown nums fl"></div>
 		</div>
-<div id="build-data"></div>
-<!--  		<div class="demo">
+
+ 		<div class="demo">
 			<div id="qiyi" class="images-shown"></div>
 		</div>
 		<div class="demo">
@@ -77,7 +77,7 @@
 		</div>
 		<div class="demo">
 			<div id="left" class="images-shown"></div>
-		</div> -->
+		</div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script>
     if(!window.jQuery)
@@ -88,12 +88,22 @@
 <script>
 $(function(){
 $('.images-shown').imageShown();
-$('#products').imageShown('build','tipsBtn',true);
-$('#lvyou').imageShown('option',{
-	'navNum':8,
+$('#products').imageShown('build');
+$('#products').imageShown('option',{
+	'navNum':4,
 	'navSpace':25,
-	'pWidth':500,
-	'pHeight':333,
+	// 'pWidth':500,
+	// 'pHeight':333,
+	'tContent':'num',
+	'tbgAnimate':false,
+	'tipsAnimate':'slide'
+});
+
+$('#lvyou').imageShown('option',{
+	'navNum':4,
+	'navSpace':25,
+	// 'pWidth':500,
+	// 'pHeight':333,
 	'tContent':'num',
 	'tbgAnimate':false,
 	//'autoPlay':false,
@@ -343,7 +353,7 @@ $('#sohu').imageShown('option',{
 	'events':'click',
 	'selected':5,
 	'ptype':true,
-	'callback':function(data){console.log(data);console.log('yes')},
+	'callback':function(data){console.log(data)},
 	'tipsBtn':true,
 	'data':[
 		{

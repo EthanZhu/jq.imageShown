@@ -87,7 +87,6 @@ $.fn.extend($.imageShown,{
 					data.push('{');
 					data.push('"n":"'+C+'"');
 					B = A.eq(M).find('a'),C=B[0];
-					console.log(B);
 					if(typeof C!='undefined'){
 						data.push('"list":');
 						D = B.length;
@@ -157,8 +156,16 @@ $.fn.extend($.imageShown,{
 			content = thisContent.join(",").replace(/{,/g,"{").replace(/,}/g,"}").replace(/\[,/g,"[").replace(/,]/g,"]").replace(/:,/g,":");
 			mainData.push(content);
 		}
-		a.data = '['+mainData.join(",")+']';
-		//$('#build-data').html(a.data);
+		var thisData = eval('['+mainData.join(",")+']');
+		a.data = [];
+		
+		// alert(typeof thisData);
+		var thisLength = thisData.length, self;
+		for(var i=0;i<thisLength;i++){
+			self = thisData[i];
+			// console.log(self);
+			if(!$t._isEmptyObject(self)) a.data.push(self)
+		}
 		a.data?	$t._updateImageShown(a):'';
 	}
 })

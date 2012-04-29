@@ -172,13 +172,15 @@ $.extend(ImageShown.prototype, {
 				if(!isEmptyObject(self)){
 					if(i<instLength) inst.data[i] = self;
 					else inst.data.push(self);
-				
 				}
 			}
 		}
 		inst.completeImg = [];
 		var data = inst.data;
+		// data?$t.log(data[0]):"";
+		// console.log(isArray(data));
 		if(data&&isArray(data)){//data is not null and data is an array
+			//console.log(data);
 			inst.total = data.length;
 			$t._updeteOptions(inst);
 			$t._instHtml(inst);
@@ -238,7 +240,7 @@ $.extend(ImageShown.prototype, {
 												   : (g_ = load ? ('<img data-origital="'+i_.p+'" src="'+$t._blankImg+'" alt="'+ i_.a +'" />') : ('<img src="'+i_.p+'" alt="'+ i_.a +'" />')),
 					$i = $(['<li class="'+ c +'"><a href="'+ i_.l +'" target="'+ i_.t +'">'+g_+'</a></li>'].join(""))
 				):(
-					$i = $(['<li class="'+ c +'">Need image here.</li>'].join(""))
+					$i = $(['<li class="'+ c +'">Missing data.</li>'].join(""))
 				);
 				C ? $i.css({'z-index': t_- I, opacity: 0}):'';
 				if(!load) $(g_).load(function(){$i.attr('data-missing','false')}).error(function(){$i.attr('data-missing','true');$i.html('<p class="'+$t._g(a,'_missing')+'">'+$t._g(a,'missing')+'</p>');});
@@ -1200,6 +1202,9 @@ $.extend(ImageShown.prototype, {
 	},
 	_extendRemove:function(target, props) {
 		extendRemove(target, props);
+	},
+	_isEmptyObject:function(obj){
+		return isEmptyObject(obj);
 	}
 });
 
