@@ -149,7 +149,7 @@ $.extend(ImageShown.prototype, {
 		inst.$itemList = $('<ul class="'+$t._g(inst,'_items')+'" />');
 		
 		if($t._g(inst,'showTips')){
-			inst.$tipsBg = $('<div class="'+$t._g(inst,'_tbackground')+'" />');
+			inst.$tipsBg = $('<div class="'+$t._g(inst,'_tbackground')+'" />').css('opacity',$t._g(inst,'opacity'));
 			inst.$tipsInfo = $('<div class="'+$t._g(inst,'_tinfo')+'">');
 		}
 		else{
@@ -302,7 +302,10 @@ $.extend(ImageShown.prototype, {
 			a.$btnPrev =  a.$btnNext = '';
 		}
 		else{
-			if($t._g(a,'tbgAnimate')) a.$scroll.appendTo(a.$navList);
+			if($t._g(a,'tbgAnimate')) {
+				$t._g(a,'events')=='click'? a.$scroll.find('a').remove():'';
+				a.$scroll.appendTo(a.$navList)
+			};
 			if(t_ <= q) a.$btnPrev =  a.$btnNext = '';
 		}
 		if($t._g(a,'showTips')) a.$tipsInfo.append($('<div class="'+$t._g(a,'_message')+'" />'));
@@ -371,7 +374,7 @@ $.extend(ImageShown.prototype, {
 		}
 		
 		if($t._g(inst,'tbgAnimate')) {
-			inst.$scroll = $('<div class="'+$t._g(inst,'_scroll')+'" />');
+			inst.$scroll = $('<div class="'+$t._g(inst,'_scroll')+'"><a href="#" />&nbsp;</div');
 			inst.scrollOver = $t._g(inst,'_sover');
 		}
 		else{
@@ -427,6 +430,9 @@ $.extend(ImageShown.prototype, {
 		$t._preClick(inst);
 		bindItemEvent();
         var auto = $t._g(inst,'autoPlay'),loop = $t._g(inst,'loop');
+        inst.$elem.delegate('a','focus',function(){
+        	if(this.blur) this.blur();
+        });
         inst.$elem.hover(function() {
         	inst.hoverPause = true;
         	!loop? inst.clickSelected = inst.selected : '';
@@ -538,15 +544,17 @@ $.extend(ImageShown.prototype, {
 		var space = $t._g(inst,'navSpace'), seen = $t._g(inst,'navNum'), thumbSeen = space*(seen-1);
 		var func = function(tag){
 			overPos > thumbSeen? $t._scrollNextByStep(inst): overPos<0? $t._resetSelected(inst):'';
-			!tag?$(this).css('z-index',3):'';
+			//!tag?$(this).css('z-index',3):'';
 		};
 		$t._display(inst);
 		
 		
 		if(bgAnimate){
-			var space = $t._g(inst,'navSpace'), $scroll=inst.$scroll;
-			position=='lr'? $scroll.css('z-index',5).stop(true,true).animate({top:overPos},speed,func)
-			 					 : $scroll.css('z-index',5).stop(true,true).animate({left:overPos},speed,func);
+			var space = $t._g(inst,'navSpace'), $scroll=inst.$scroll, 
+			$scrollLink = $scroll.find('a'),scrollLink=$scrollLink[0],$objLink = obj.find('a:first'),objLink=$objLink[0];
+			typeof scrollLink!='undefined'? typeof objLink!='undefined'? (scrollLink.href = objLink.href,scrollLink.target = objLink.target):'':'';
+			position=='lr'? $scroll.stop(true,true).animate({top:overPos},speed,func)
+			 			  : $scroll.stop(true,true).animate({left:overPos},speed,func);
 		}
 		else{
 			func(true);
@@ -646,13 +654,14 @@ $.extend(ImageShown.prototype, {
 				hr_='';
 			h2_= h2_!='' ? '<h2>'+h2_+'<\/h2>':'' ;
 			h3_= h3_!='' ? '<h3>'+h3_+'<\/h3>':'' ;
-			if(h2_!='' || h3_!='') hr_='<hr class="separator" />';
-			info += h2_+h3_+hr_;
+			
+			info += h2_+h3_;
 			var ot = thisInfo.ot;
 			ot= GOT(ot,_link,target,inst);
 			ot= typeof ot !='undefined'? ot:'';
 			var msg = thisInfo.m? '<p class="info">'+thisInfo.m+'<\/p>':'';
-			info += ot+msg;
+			hr_= (h2_!='' || h3_!='') &&(ot!=''||msg!='') ? '<hr class="separator" />':'';
+			info += hr_+ot+msg;
 			if ($t._g(inst,'tipsBtn')){
 				var _btn = $t._g(inst,'_tbtn');
 				var _tbtn = GTB(thisInfo.b_, _link,target, _btn);
