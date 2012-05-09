@@ -2,66 +2,73 @@
 <html>
 	<head>
 	<meta charset="utf-8" />
-	<title>Flash To Javascript</title>
+	<title>ContentShown jQuery plugin</title>
 	<link rel="stylesheet" type="text/css" href="Content/css/reset.css" />
 	<link rel="stylesheet" type="text/css" href="Content/css/images-shown.css" />
 	</head>
 	<body>
+<p>/******************************************</p>
+<p><strong>Update to v2.0</strong></p>
+<p>******************************************/</p>
+
+<p>It has renamed， please <a href="http://ethanzhu.github.com/jq.contentShown/" target="_self">visiit here</a></p>
+		<!--
 		<div class="demo clearfix">
-			<div id="products" class="images-shown nums fl">
-				<ul>
-					<li class="img-player-item">
-						<p class="this-content"><a href="http://www.gomesoft.com/avi/convert-avi-to-quicktime-mov-mac.html" target="_blank"><img src="Content/images/avi-to-mov-mac.jpg"></a></p>
-						<p class="global-link">http://www.gomesoft.com/avi/</p>
-						<label>
-							<h2><a href="http://www.gomesoft.com/avi/convert-avi-to-quicktime-mov-mac.html" target="_blank">Convert AVI to MOV Mac</a></h2>
-							<p class="tip-message">Cheap Video Converter</p>
-						</label>
-					</li>
-					<li class="img-player-item">
-						<p class="this-content"><a href="http://www.gomesoft.com/dvd/rip-convert-dvd-to-mp4-mac.html" target="_blank"><img src="Content/images/dvd-to-mp4.jpg"></a></p>
-						<p class="global-link">http://www.gomesoft.com/dvd/</p>
-						<label>
-							<h2><a href="http://www.gomesoft.com/dvd/rip-convert-dvd-to-mp4-mac.html" target="_blank">Rip DVD to MP4</a></h2>
-							<p class="tip-message">DVD Burner software provider.</p>
-						</label>
-					</li>
-					<li class="img-player-item">
-						<p class="this-content"><a href="http://www.gomesoft.com/m4v/convert-burn-m4v-to-dvd.html" target="_blank"><img src="Content/images/m4v-to-dvd.jpg"></a></p>
-						<p class="global-link">http://www.gomesoft.com/m4v/</p>
-						<label>
-							<h2><a href="http://www.gomesoft.com/m4v/convert-burn-m4v-to-dvd.html" target="_blank">M4V to DVD</a></h2>
-						</label>
-					</li>
-					<li class="img-player-item">
-						<p class="this-content"><a href="http://www.gomesoft.com/mts-m2ts/convert-mts-m2ts-to-mov-quicktime-mac.html" target="_blank"><img src="Content/images/mts-to-mov.jpg"></a></p>
-						<p class="global-link">http://www.gomesoft.com/mts-m2ts/</p>
-						<label>
-							<h2><a href="http://www.gomesoft.com/mts-m2ts/convert-mts-m2ts-to-mov-quicktime-mac.html">M2TS to MOV Mac</a></h2>
-						</label>
-					</li>
-				</ul>
-			</div>
-			<div id="lvyou" class="images-shown nums fl"></div>
-		</div>
- 		<div class="demo">
-			<div id="qiyi" class="images-shown"></div>
-		</div>
-		<div class="demo">
-			<div id="sohu" class="images-shown"></div>
-		</div>
-		<div class="demo">
-			<div id="xunlei" class="images-shown"></div>
-		</div>
-		<div class="demo">
-			<div id="qiyi1" class="images-shown"></div>
-		</div>
- 		<div class="demo">
-			<div id="qiyi2" class="images-shown"></div>
-		</div>
-		<div class="demo">
-			<div id="left" class="images-shown"></div>
-		</div>
+					<div id="products" class="images-shown nums fl">
+						<ul>
+							<li class="img-player-item">
+								<p class="this-content"><a href="http://www.gomesoft.com/avi/convert-avi-to-quicktime-mov-mac.html" target="_blank"><img src="Content/images/avi-to-mov-mac.jpg"></a></p>
+								<p class="global-link">http://www.gomesoft.com/avi/</p>
+								<label>
+									<h2><a href="http://www.gomesoft.com/avi/convert-avi-to-quicktime-mov-mac.html" target="_blank">Convert AVI to MOV Mac</a></h2>
+									<p class="tip-message">Cheap Video Converter</p>
+								</label>
+							</li>
+							<li class="img-player-item">
+								<p class="this-content"><a href="http://www.gomesoft.com/dvd/rip-convert-dvd-to-mp4-mac.html" target="_blank"><img src="Content/images/dvd-to-mp4.jpg"></a></p>
+								<p class="global-link">http://www.gomesoft.com/dvd/</p>
+								<label>
+									<h2><a href="http://www.gomesoft.com/dvd/rip-convert-dvd-to-mp4-mac.html" target="_blank">Rip DVD to MP4</a></h2>
+									<p class="tip-message">DVD Burner software provider.</p>
+								</label>
+							</li>
+							<li class="img-player-item">
+								<p class="this-content"><a href="http://www.gomesoft.com/m4v/convert-burn-m4v-to-dvd.html" target="_blank"><img src="Content/images/m4v-to-dvd.jpg"></a></p>
+								<p class="global-link">http://www.gomesoft.com/m4v/</p>
+								<label>
+									<h2><a href="http://www.gomesoft.com/m4v/convert-burn-m4v-to-dvd.html" target="_blank">M4V to DVD</a></h2>
+								</label>
+							</li>
+							<li class="img-player-item">
+								<p class="this-content"><a href="http://www.gomesoft.com/mts-m2ts/convert-mts-m2ts-to-mov-quicktime-mac.html" target="_blank"><img src="Content/images/mts-to-mov.jpg"></a></p>
+								<p class="global-link">http://www.gomesoft.com/mts-m2ts/</p>
+								<label>
+									<h2><a href="http://www.gomesoft.com/mts-m2ts/convert-mts-m2ts-to-mov-quicktime-mac.html">M2TS to MOV Mac</a></h2>
+								</label>
+							</li>
+						</ul>
+					</div>
+					<div id="lvyou" class="images-shown nums fl"></div>
+				</div>
+				 <div class="demo">
+					<div id="qiyi" class="images-shown"></div>
+				</div>
+				<div class="demo">
+					<div id="sohu" class="images-shown"></div>
+				</div>
+				<div class="demo">
+					<div id="xunlei" class="images-shown"></div>
+				</div>
+				<div class="demo">
+					<div id="qiyi1" class="images-shown"></div>
+				</div>
+				 <div class="demo">
+					<div id="qiyi2" class="images-shown"></div>
+				</div>
+				<div class="demo">
+					<div id="left" class="images-shown"></div>
+				</div>-->
+		
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script>
     if(!window.jQuery)

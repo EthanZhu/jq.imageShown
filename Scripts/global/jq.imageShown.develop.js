@@ -1,7 +1,7 @@
 /******************************************
  * gomesoft.com
  *
- * @author          Ethan.zhu（zhuyidong）
+ * @author          Ethan.zhu（zhuyidong＄1�7
  * @copyright       Copyright (c) 2012 gomesoft.com
  * @license         This imageShown jQuery plug-in is dual licensed under the MIT and GPL licenses.
  * @link            http://www.gomesoft.com
